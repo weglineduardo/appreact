@@ -2,6 +2,11 @@ import React from "react";
 import logo from "./logo.svg";
 import callApi from "./components/callApi";
 import "./App.css";
+import Accordion from "./screean/acordion";
+import NavBar from "./screean/navBar";
+import RadioButton from "./screean/radioButton";
+import CheckBox from "./screean/checkBox";
+import DataBsTarget from "./screean/dataBsTarget";
 
 function App() {
   const BASE_URL = process.env.REACT_APP_BASE_URL_API;
@@ -13,63 +18,20 @@ function App() {
   console.log(r);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+      <NavBar />
+      <RadioButton />
+
+      <header className="">
+        <CheckBox />
         <button onClick={CallApi} type="button" className="btn btn-primary">
           Primary
         </button>
+        <DataBsTarget />
       </header>
 
-      <div
-        className="btn-group"
-        role="group"
-        aria-label="Basic radio toggle button group"
-      >
-        <input
-          type="radio"
-          className="btn-check"
-          name="btnradio"
-          id="btnradio1"
-          checked={true}
-        />
-        <label className="btn btn-outline-primary">Radio 1</label>
-        <input
-          type="radio"
-          className="btn-check"
-          name="btnradio"
-          id="btnradio2"
-          checked={true}
-        />
-        <label className="btn btn-outline-primary">Radio 2</label>
-        <input
-          type="radio"
-          className="btn-check"
-          name="btnradio"
-          id="btnradio3"
-          checked={true}
-        />
-        <label className="btn btn-outline-primary">Radio 3</label>
-      </div>
-
-      <div className="btn-group-horizontal">
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
+      <div className="container-fluid col-12">
+        <Accordion />
+        <Accordion />
       </div>
     </div>
   );
