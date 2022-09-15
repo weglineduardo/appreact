@@ -6,9 +6,12 @@ class BonitaApi {
     let token = "";
     try {
       const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+      const LOGINSERVICE = process.env.REACT_APP_API_LOGINSERVICE;
       const endpoint =
         BASE_URL +
-        "/bonita/loginservice?username=walter.bates&password=bpm&redirect=false";
+        LOGINSERVICE +
+        "username=walter.bates&password=bpm&redirect=false";
+
       const intance = axios.create({
         baseURL: endpoint,
         mode: "cors",
