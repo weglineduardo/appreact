@@ -7,7 +7,7 @@ import CheckBox from "./screean/checkBox";
 import DataBsTarget from "./screean/dataBsTarget";
 import AlertDanger from "./screean/alertDanger";
 
-function App() {
+function AppStyle() {
   const CallApi = async () => {
     callApi();
   };
@@ -43,4 +43,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppStyle;
