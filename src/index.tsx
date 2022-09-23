@@ -7,7 +7,14 @@ import reportWebVitals from "./reportWebVitals";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+const ll = document.cookie;
+function getJSessionId() {
+  document.cookie = "JSESSIONID=John";
+  let jsId = document.cookie.match(/JSESSIONID=[^;]+/);
+  return jsId;
+}
 
+const ll2 = getJSessionId();
 root.render(
   <React.StrictMode>
     <App />

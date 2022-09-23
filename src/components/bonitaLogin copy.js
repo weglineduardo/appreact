@@ -1,12 +1,12 @@
 //const BonitaApi = require("../models/BonitaApi");
 import BonitaApi from "../models/BonitaApi";
 
-export const callApi = async () => {
+export const bonitaLogin = async () => {
   const bonita = new BonitaApi();
   const login = await bonita.login();
   console.log(login);
-  //eturn { };
+  //return [""];
 };
 
 //callApi();
-export default callApi;
+export default bonitaLogin;
