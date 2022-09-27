@@ -31,8 +31,6 @@ export const bonitaLogin = async () => {
   const cok = new kks();
   const login = await bonita.login();
 
-  //const login = await bonita.loginFech();
-
   console.log("is login bonitaLogin ", login);
   //return {};
 };

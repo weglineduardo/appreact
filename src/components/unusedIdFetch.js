@@ -1,12 +1,13 @@
 //const BonitaApi = require("../models/BonitaApi");
 import BonitaApi from "../models/BonitaApi";
 
-export const bonitaLogin = async () => {
+export const unusedIdFetch = async () => {
   const bonita = new BonitaApi();
-  const login = await bonita.login();
-  console.log(login);
-  //return [""];
+
+  const login = await bonita.unusedIdFech();
+
+  //return {};
 };
 
 //callApi();
-export default bonitaLogin;
+export default unusedIdFetch;

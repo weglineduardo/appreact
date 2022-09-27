@@ -1,11 +1,16 @@
 import logo from "./logo.svg";
 import bonitaLogin from "./components/bonitaLogin";
+import fetchBonitaLogin from "./components/fetchBonitaLogin";
+import fetchCase from "./components/fetchCase";
+import unusedIdFetch from "./components/unusedIdFetch";
+
 import bonitaCase from "./components/bonitaCase";
 import Cookies from "universal-cookie";
 import { Cookies as kks } from "react-cookie";
 import axios from "axios";
 //import cookies from "es-cookie";
 import "./App.css";
+import { Console } from "console";
 
 function App() {
   const loginService = async () => {
@@ -40,14 +45,23 @@ function App() {
     localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
     localStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));*/
   };
+  const unusedIdFechService = async () => {
+    unusedIdFetch();
+  };
+  const fetchLoginService = async () => {
+    fetchBonitaLogin();
+  };
 
+  const fetchCases = async () => {
+    fetchCase();
+  };
   const obtenerCookiesNode = async () => {
     // bonitaLogin();
 
     let config = {
       method: "get",
       mode: "no-cors",
-      url: "http://localhost:5300/api",
+      url: "http://localhost:5300/bonita/login",
       headers: { "Access-Control-Allow-Origin": "http://localhost:443" },
     };
     //https://jsonplaceholder.typicode.com/users/1
@@ -55,11 +69,20 @@ function App() {
       .then(function (res) {
         console.log(" await axios");
         console.log(JSON.stringify(res.data));
+        //console.log(res.data);
+        const data_array = JSON.stringify(res.data).split(",");
+        console.log(data_array[0].split(":")[1].split(","));
+        console.log(data_array[1].split(":")[1].split(","));
+        const cok = new kks();
+        cok.set("JSESSIONID", data_array[0].split(":")[1].split(","));
+        cok.set("JSESSIONIDNODE", data_array[0].split(":")[1].split(","));
+
+        cok.set("X-Bonita-API-Token", data_array[1].split(":")[1].split(","));
       })
       .catch(function (error) {
         console.log(error);
       });
-    console.log(rst);
+    //console.log(rst);
 
     //const cookies = new Cookies();
     //const cok = new kks();
@@ -89,6 +112,48 @@ function App() {
     sessionStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));
     localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
     localStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));*/
+  };
+  const obtenerCase = async () => {
+    const cookies = new Cookies();
+    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
+    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
+    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+    const hs = {
+      "Access-Control-Allow-Origin": "http://localhost:443",
+      // JSESSIONID: `${JSESSIONIDNODE}`,
+      "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
+    };
+    const endpointc = BASE_URL + "/bonita/API/bpm/case/13001";
+    let config = {
+      method: "get",
+      mode: "no-cors",
+      url: endpointc,
+      headers: hs,
+      //{
+      //  "Access-Control-Allow-Origin": "http://localhost:443",
+      //  JSESSIONID: `${JSESSIONIDNODE}`,
+      //  "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
+      //},
+    };
+    console.log(config);
+    //https://jsonplaceholder.typicode.com/users/1
+    const rst = await axios(config)
+      .then(function (res) {
+        console.log(" await axios");
+        console.log(JSON.stringify(res.data));
+        //console.log(res.data);
+        const data_array = JSON.stringify(res.data).split(",");
+        console.log(data_array[0].split(":")[1].split(","));
+        console.log(data_array[1].split(":")[1].split(","));
+        const cok = new kks();
+        cok.set("JSESSIONID", data_array[0].split(":")[1].split(","));
+        cok.set("JSESSIONIDNODE", data_array[0].split(":")[1].split(","));
+
+        cok.set("X-Bonita-API-Token", data_array[1].split(":")[1].split(","));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
   const getCase = async () => {
     const cookies = new Cookies();
@@ -131,13 +196,30 @@ function App() {
           Obtener cookies Node
         </button>
         <button
+          onClick={fetchLoginService}
+          type="button"
+          className="btn btn-primary"
+        >
+          Fetch Login
+        </button>
+        <button
+          onClick={unusedIdFechService}
+          type="button"
+          className="btn btn-primary"
+        >
+          Fetch unusedId
+        </button>
+        <button onClick={fetchCases} type="button" className="btn btn-primary">
+          Case fetch
+        </button>
+        <button
           onClick={loginService}
           type="button"
           className="btn btn-primary"
         >
           Login
         </button>
-        <button onClick={getCase} type="button" className="btn btn-primary">
+        <button onClick={obtenerCase} type="button" className="btn btn-primary">
           Get case
         </button>
         <button onClick={getProcess} type="button" className="btn btn-primary">
