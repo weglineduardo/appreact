@@ -1,11 +1,50 @@
-const axios = require("axios");
+//import { useContext, useState } from "react";
 
+const axios = require("axios");
 //const Cookies = require("universal-cookie");
 //const cookies = require("es-cookie");
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
+
 class BonitaApi {
   async login() {
+    try {
+      const endpoint =
+        "http://localhost:8080" +
+        "/bonita/loginservice?username=walter.bates&password=bpm&redirect=false";
+      const intance = axios.create({
+        baseURL: endpoint,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+      const resb = await intance
+        .post
+        // "/bonita/loginservice?username=walter.bates&password=bpm&redirect=false"
+        ();
+      const hederResp = resb.headers["set-cookie"]
+        ? resb.headers["set-cookie"]
+        : [];
+      const JSESSIONIDNODE = hederResp[1]
+        .split(";")[0]
+        .split(",")[0]
+        .split("=")[1];
+      const XBonitaAPIToken = hederResp[2]
+        .split(";")[0]
+        .split(",")[0]
+        .split("=")[1];
+      console.log(JSESSIONIDNODE, XBonitaAPIToken);
+      const data = [JSESSIONIDNODE, XBonitaAPIToken];
+      this.almacenarCookies();
+      return { JSESSIONIDNODE, XBonitaAPIToken };
+    } catch (error) {
+      console.log("error **********", error);
+      return { error };
+    }
+  }
+
+  async loginbkp() {
     let sId = "";
     let token = "";
     // return;
@@ -100,7 +139,6 @@ class BonitaApi {
     //lemos cookie del response y almacenamos local y session storage
     this.almacenarCookies();
   }
-
   almacenarCookies = () => {
     console.log("almacenar coolies ");
     localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
@@ -126,7 +164,7 @@ class BonitaApi {
     try {
       const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-      const endpointc = BASE_URL + "/bonita/API/bpm/case/11001";
+      const endpointc = BASE_URL + "/bonita/API/bpm/case/2001";
 
       let her = {
         "Content-Type": "application/json;charset=utf-8",
@@ -261,24 +299,19 @@ class BonitaApi {
       };
       const BASE_URL =
         process.env.REACT_APP_BASE_URL_API + "/bonita/loginservice";
-      console.log("---BASE_URL+++++++", BASE_URL);
-      console.log("requestOptions +++++++", requestOptions);
-      console.log("myHeaders +++++++", myHeaders);
-      //return fetch(BASE_URL + "/loginservice", requestOptions);
+
       return await fetch(BASE_URL, requestOptions)
         .then((result) => {
           if (!result.ok) {
             throw Error(result.status);
           }
           console.log(result);
-          return;
+          return result;
           //return getAuthToken();
         })
         .catch((error) => {
           console.log("error fetch", error);
-          return;
-          /*document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Login error. " + error;*/
+          return error;
         });
     }
     async function caseBonita() {
@@ -368,18 +401,12 @@ class BonitaApi {
   }
   async unusedIdFech() {
     unusedIdFechBonita();
-
-    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
     async function unusedIdFechBonita() {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-      var urlencoded = new URLSearchParams();
-      var requestOptions = {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json;charset=utf-8");
+      const requestOptions = {
         method: "GET",
         headers: myHeaders,
-        //body: urlencoded,
         redirect: "follow",
         credentials: "include",
       };
@@ -387,21 +414,30 @@ class BonitaApi {
         process.env.REACT_APP_BASE_URL_API +
         "/bonita/API/system/session/unusedId";
 
-      //return fetch(BASE_URL + "/loginservice", requestOptions);
       return await fetch(BASE_URL, requestOptions)
         .then((result) => {
           if (!result.ok) {
+            console.log(result.status, result.statusText);
             throw Error(result.status);
           }
-          console.log(result);
-          return;
-          //return getAuthToken();
+          console.log(
+            "result.status fetch",
+            result.status + " " + result.statusText
+          );
+
+          console.log(
+            "result.headers fetch",
+            result.headers.get("X-Bonita-API-Token")
+          );
+          result.json().then((json) => {
+            console.log("result.body jsom = ", json);
+          });
+
+          return result;
         })
         .catch((error) => {
           console.log("error fetch", error);
-          return;
-          /*document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Login error. " + error;*/
+          return error;
         });
     }
     async function caseBonita() {
@@ -490,17 +526,17 @@ class BonitaApi {
     }
   }
   async caseFech() {
-    caseBonita();
+    caseFechBonita();
 
-    async function caseBonita() {
+    async function caseFechBonita() {
       const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-      console.log("---X_Bonita_API_Token--", X_Bonita_API_Token);
+      //console.log("---X_Bonita_API_Token--", X_Bonita_API_Token);
       const myHeaders = new Headers();
       myHeaders.append(
         "Content-type",
         "application/json",
         "Cookie",
-        `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=+${X_Bonita_API_Token}`
+        `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=${X_Bonita_API_Token}`
       );
 
       const urlencoded = new URLSearchParams();
@@ -508,47 +544,35 @@ class BonitaApi {
       const requestOptions = {
         method: "GET",
         headers: myHeaders,
-        //body: urlencoded, // JSON.stringifiy({ requestOptions })
         redirect: "follow",
         credentials: "include",
       };
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/1001";
-      console.log("BASE_URL+++++++", BASE_URL);
-      console.log("requestOptions +++++++", requestOptions);
-      console.log("myHeaders +++++++", myHeaders);
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/2001";
 
-      const param = JSON.stringify({
-        method: "GET",
-        headers: myHeaders,
-        body: urlencoded, // JSON.stringifiy({ requestOptions })
-        redirect: "follow",
-        credentials: "include",
-      });
-
-      const ver = {
-        method: "GET",
-        //body: JSON.stringify(urlencoded),
-        mode: "cors",
-        headers: {
-          "Content-type": "application/json",
-          Cookie: `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=+${X_Bonita_API_Token}`,
-        },
-      };
-      return await fetch(BASE_URL, requestOptions) //param   //requestOptions
+      return await fetch(BASE_URL, requestOptions)
         .then((result) => {
           if (!result.ok) {
+            console.log(result.status, result.statusText);
             throw Error(result.status);
           }
-          console.log(result);
-          return;
-          //return getAuthToken();
+          console.log(
+            "result.status fetch",
+            result.status + " " + result.statusText
+          );
+
+          console.log(
+            "result.headers fetch",
+            result.headers.get("X-Bonita-API-Token")
+          );
+          result.json().then((json) => {
+            console.log("result.body jsom = ", json);
+          });
+          return result;
         })
         .catch((error) => {
           console.log("error fetch", error);
-          return;
-          /*document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Login error. " + error;*/
+          return error;
         });
     }
   }

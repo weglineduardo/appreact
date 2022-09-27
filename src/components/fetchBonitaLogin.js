@@ -9,9 +9,6 @@ export const fetchBonitaLogin = async () => {
 
   const cok = new kks();
   const login = await bonita.loginFech();
-
-  console.log("is login bonitaLogin ", login);
-  //return {};
 };
 
 //callApi();

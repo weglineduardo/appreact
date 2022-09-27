@@ -7,10 +7,7 @@ const { Cookies: kks } = require("react-cookie");
 export const fetchCase = async () => {
   const bonita = new BonitaApi();
 
-  const login = await bonita.caseFech();
-
-  console.log("is login bonitaLogin ", login);
-  //return {};
+  await bonita.caseFech();
 };
 
 //callApi();

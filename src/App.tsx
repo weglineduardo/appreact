@@ -3,18 +3,66 @@ import bonitaLogin from "./components/bonitaLogin";
 import fetchBonitaLogin from "./components/fetchBonitaLogin";
 import fetchCase from "./components/fetchCase";
 import unusedIdFetch from "./components/unusedIdFetch";
-
+import React, { useState } from "react";
 import bonitaCase from "./components/bonitaCase";
 import Cookies from "universal-cookie";
 import { Cookies as kks } from "react-cookie";
 import axios from "axios";
-//import cookies from "es-cookie";
 import "./App.css";
-import { Console } from "console";
 
+const setuse = () => {};
 function App() {
+  const axioslogin = async () => {
+    const endpoint =
+      "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
+
+    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios
+      .get(
+        "/bonita/loginservice?username=walter.bates&password=bpm&redirect=true"
+      )
+      .then((resp) => {
+        //console.log("resp JSON.stringif = ", JSON.stringify(resp));
+        let result = resp; //resp.data;
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    /*axios
+      .get("https://jsonplaceholder.typicode.com/users/1")
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.log(err));*/
+  };
+
+  /*
+    await axios({
+      method: "post",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+      url: endpoint,
+    })
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+      
+        };*/
+
   const loginService = async () => {
-    bonitaLogin();
+    axioslogin();
+    //bonitaLogin();
 
     //const cookies = new Cookies();
     //const cok = new kks();
@@ -123,10 +171,10 @@ function App() {
       // JSESSIONID: `${JSESSIONIDNODE}`,
       "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
     };
-    const endpointc = BASE_URL + "/bonita/API/bpm/case/13001";
+    const endpointc = BASE_URL + "/bonita/API/bpm/case/1001";
     let config = {
-      method: "get",
-      mode: "no-cors",
+      method: "GET",
+      mode: "cors",
       url: endpointc,
       headers: hs,
       //{
@@ -183,6 +231,12 @@ function App() {
   console.log(document.cookie);
   console.log("cookies.getAll()::", cookies.getAll());
   */
+  const Message = () => {
+    const [count, setCount] = useState(0);
+    setCount(15);
+    const messageState = useState("");
+    const listState = useState([]);
+  };
 
   return (
     <div className="App">

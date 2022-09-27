@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(
 );
 const ll = document.cookie;
 function getJSessionId() {
-  document.cookie = "JSESSIONID=John";
+  //document.cookie = "JSESSIONID=John";
   let jsId = document.cookie.match(/JSESSIONID=[^;]+/);
   return jsId;
 }
