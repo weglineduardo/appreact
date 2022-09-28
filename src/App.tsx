@@ -110,11 +110,11 @@ function App() {
       method: "get",
       mode: "no-cors",
       url: "http://localhost:5300/bonita/login",
-      headers: { "Access-Control-Allow-Origin": "http://localhost:443" },
+      headers: { "Access-Control-Allow-Origin": "*" },
     };
     //https://jsonplaceholder.typicode.com/users/1
     const rst = await axios(config)
-      .then(function (res) {
+      .then(function(res) {
         console.log(" await axios");
         console.log(JSON.stringify(res.data));
         //console.log(res.data);
@@ -127,7 +127,7 @@ function App() {
 
         cok.set("X-Bonita-API-Token", data_array[1].split(":")[1].split(","));
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log(error);
       });
     //console.log(rst);
@@ -161,47 +161,65 @@ function App() {
     localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
     localStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));*/
   };
+  /////////////////////
   const obtenerCase = async () => {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-    const hs = {
-      "Access-Control-Allow-Origin": "http://localhost:443",
-      // JSESSIONID: `${JSESSIONIDNODE}`,
-      "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
-    };
-    const endpointc = BASE_URL + "/bonita/API/bpm/case/1001";
-    let config = {
-      method: "GET",
-      mode: "cors",
-      url: endpointc,
-      headers: hs,
-      //{
-      //  "Access-Control-Allow-Origin": "http://localhost:443",
-      //  JSESSIONID: `${JSESSIONIDNODE}`,
-      //  "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
-      //},
-    };
-    console.log(config);
-    //https://jsonplaceholder.typicode.com/users/1
-    const rst = await axios(config)
-      .then(function (res) {
-        console.log(" await axios");
-        console.log(JSON.stringify(res.data));
-        //console.log(res.data);
-        const data_array = JSON.stringify(res.data).split(",");
-        console.log(data_array[0].split(":")[1].split(","));
-        console.log(data_array[1].split(":")[1].split(","));
-        const cok = new kks();
-        cok.set("JSESSIONID", data_array[0].split(":")[1].split(","));
-        cok.set("JSESSIONIDNODE", data_array[0].split(":")[1].split(","));
+    axios.defaults.baseURL = "http://localhost:8080";
 
-        cok.set("X-Bonita-API-Token", data_array[1].split(":")[1].split(","));
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
+    console.log(
+      "axios.defaults.headers axios obtenercase",
+      axios.defaults.headers
+    );
+
+    ////////////
+    axios
+      .get("/bonita/API/bpm/case/3001")
+      .then((resp) => {
+        let result = resp;
+        console.log(result);
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
+    return;
+  };
+
+  const obtenerProcess = async () => {
+    const cookies = new Cookies();
+    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
+    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
+    axios.defaults.baseURL = "http://localhost:8080";
+
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
+    console.log(
+      "axios.defaults.headers axios obtenercase",
+      axios.defaults.headers
+    );
+
+    ////////////
+    axios
+      .get(
+        "/bonita/API/bpm/case?p=0&c=10&f=processDefinitionId=6726087166707818640"
+      )
+      .then((resp) => {
+        let result = resp;
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return;
   };
   const getCase = async () => {
     const cookies = new Cookies();
@@ -218,19 +236,10 @@ function App() {
     bonitaCase(JSESSIONID, X_Bonita_API_Token);
   };
   const getProcess = async () => {
-    bonitaLogin();
+    //bonitaLogin();
+    obtenerProcess();
   };
-  /*const r = CallApi();
-  console.log(r);
-  console.log(cookies.get("myCat")); // Pacman
-  console.log(cookies.get("JSESSIONID"));
-  console.log(cookies.get("X-Bonita-API-Token"));
-  cookies.set("synbonitalab ", "synbonitalab", {
-    path: "https://synbonitalab.az.synchro.ar",
-  });
-  console.log(document.cookie);
-  console.log("cookies.getAll()::", cookies.getAll());
-  */
+
   const Message = () => {
     const [count, setCount] = useState(0);
     setCount(15);

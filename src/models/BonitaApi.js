@@ -150,7 +150,7 @@ class BonitaApi {
   async case(JSESSIONID, X_Bonita_API_Token) {
     const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-    const endpointc = BASE_URL + "/bonita/API/bpm/case/10002";
+    const endpointc = BASE_URL + "/bonita/API/bpm/case/3001";
     console.log("endpointc case aqui ", endpointc);
     console.log(
       "async case(JSESSIONID, X_Bonita_API_Toke) ",
@@ -158,23 +158,24 @@ class BonitaApi {
       X_Bonita_API_Token
     );
 
-    //verificamos  si la sesion esta activa en la api
-    //this.unusedId(JSESSIONID, X_Bonita_API_Token);
-
     try {
       const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-      const endpointc = BASE_URL + "/bonita/API/bpm/case/2001";
+      const endpointc = BASE_URL + "/bonita/API/bpm/case/3001";
 
       let her = {
         "Content-Type": "application/json;charset=utf-8",
         Cookie: `JSESSIONID=${JSESSIONID};X_Bonita_API_Token=${X_Bonita_API_Token}; bonita.tenant=1; BOS_Locale=en`,
       };
       her = {
-        "Content-Type": "application/json;charset=utf-8",
-        JSESSIONID: `${JSESSIONID}`,
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
         "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
       };
+      /*  "Content-type",
+                "application/json",
+                "Cookie",
+                `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=${X_Bonita_API_Token}`;*/
       console.log("her==", her);
       const intancec = axios.create({
         baseURL: endpointc,
@@ -329,7 +330,7 @@ class BonitaApi {
         redirect: "follow",
       };
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/1";
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/3001";
       console.log("BASE_URL+++++++", BASE_URL);
       console.log("requestOptions +++++++", requestOptions);
       console.log("myHeaders +++++++", myHeaders);
@@ -455,7 +456,7 @@ class BonitaApi {
         redirect: "follow",
       };
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/1";
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/3001";
       console.log("BASE_URL+++++++", BASE_URL);
       console.log("requestOptions +++++++", requestOptions);
       console.log("myHeaders +++++++", myHeaders);
@@ -548,7 +549,7 @@ class BonitaApi {
         credentials: "include",
       };
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/2001";
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/3001";
 
       return await fetch(BASE_URL, requestOptions)
         .then((result) => {
@@ -590,7 +591,7 @@ var data = qs.stringify({
 });
 var config = {
   method: "get",
-  url: "https://synbonitalab.az.synchro.ar/bonita/API/bpm/case/18",
+  url: "https://synbonitalab.az.synchro.ar/bonita/API/bpm/case/3001",
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
     Cookie:
