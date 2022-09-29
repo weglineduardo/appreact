@@ -150,7 +150,7 @@ class BonitaApi {
   async case(JSESSIONID, X_Bonita_API_Token) {
     const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-    const endpointc = BASE_URL + "/bonita/API/bpm/case/3001";
+    const endpointc = BASE_URL + "/bonita/API/bpm/case/4001";
     console.log("endpointc case aqui ", endpointc);
     console.log(
       "async case(JSESSIONID, X_Bonita_API_Toke) ",
@@ -161,7 +161,7 @@ class BonitaApi {
     try {
       const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-      const endpointc = BASE_URL + "/bonita/API/bpm/case/3001";
+      const endpointc = BASE_URL + "/bonita/API/bpm/case/4001";
 
       let her = {
         "Content-Type": "application/json;charset=utf-8",
@@ -315,90 +315,6 @@ class BonitaApi {
           return error;
         });
     }
-    async function caseBonita() {
-      const myHeaders = new Headers();
-      myHeaders.append(
-        "X-Bonita-API-Token=add93259-565e-40e3-bd12-f62d78a197ef"
-      );
-
-      const urlencoded = new URLSearchParams();
-
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        body: urlencoded,
-        redirect: "follow",
-      };
-      const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/3001";
-      console.log("BASE_URL+++++++", BASE_URL);
-      console.log("requestOptions +++++++", requestOptions);
-      console.log("myHeaders +++++++", myHeaders);
-      return await fetch(BASE_URL, requestOptions)
-        .then((result) => {
-          if (!result.ok) {
-            throw Error(result.status);
-          }
-          console.log(result);
-          return;
-          //return getAuthToken();
-        })
-        .catch((error) => {
-          console.log("error fetch", error);
-          return;
-          /*document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Login error. " + error;*/
-        });
-    }
-
-    function getAuthToken() {
-      var myHeaders = new Headers();
-      var requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        credentials: "include",
-      };
-      const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-      return fetch(BASE_URL + "/API/system/session/unusedId", requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.status);
-          }
-          return response.headers.get("x-bonita-api-token");
-        })
-        .catch((error) => {
-          document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Unable to retrieve authentication token from session. " +
-            error;
-        });
-    }
-
-    async function componentDidMount() {
-      const ufa = await fetch("http://localhost:5300/api", {
-        method: "GET", // *GET, POST, PUT, DELETE, etc.
-        mode: "no-cors", // no-cors, *cors, same-origin
-        //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-        //credentials: "same-origin", // include, *same-origin, omit
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-          "Access-Control-Allow-Origin": "http://localhost:443",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          return res;
-        })
-        .then((res) => {
-          const ressetState = {
-            url: res.url,
-            status: res.status,
-          };
-          console.log(ressetState);
-        });
-      return ufa;
-    }
   }
   async unusedIdFech() {
     unusedIdFechBonita();
@@ -456,7 +372,7 @@ class BonitaApi {
         redirect: "follow",
       };
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/3001";
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/4001";
       console.log("BASE_URL+++++++", BASE_URL);
       console.log("requestOptions +++++++", requestOptions);
       console.log("myHeaders +++++++", myHeaders);
@@ -549,7 +465,7 @@ class BonitaApi {
         credentials: "include",
       };
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/3001";
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/4001";
 
       return await fetch(BASE_URL, requestOptions)
         .then((result) => {
@@ -591,7 +507,7 @@ var data = qs.stringify({
 });
 var config = {
   method: "get",
-  url: "https://synbonitalab.az.synchro.ar/bonita/API/bpm/case/3001",
+  url: "https://synbonitalab.az.synchro.ar/bonita/API/bpm/case/4001",
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
     Cookie:

@@ -1,4 +1,9 @@
 import logo from "./logo.svg";
+import Accordion from "./screean/acordion";
+import NavBar from "./screean/navBar";
+import RadioButton from "./screean/radioButton";
+import CheckBox from "./screean/checkBox";
+import DataBsTarget from "./screean/dataBsTarget";
 import bonitaLogin from "./components/bonitaLogin";
 import fetchBonitaLogin from "./components/fetchBonitaLogin";
 import fetchCase from "./components/fetchCase";
@@ -10,8 +15,9 @@ import { Cookies as kks } from "react-cookie";
 import axios from "axios";
 import "./App.css";
 
-const setuse = () => {};
 function App() {
+  const [serviceLogin, setServiceLogin] = useState("");
+
   const axioslogin = async () => {
     const endpoint =
       "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
@@ -26,68 +32,19 @@ function App() {
       )
       .then((resp) => {
         //console.log("resp JSON.stringif = ", JSON.stringify(resp));
+        //setServiceLogin(resp.data);
         let result = resp; //resp.data;
         console.log(result);
       })
       .catch((error) => {
         console.log(error);
       });
-
-    /*axios
-      .get("https://jsonplaceholder.typicode.com/users/1")
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((err) => console.log(err));*/
   };
-
-  /*
-    await axios({
-      method: "post",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-      url: endpoint,
-    })
-      .then(function (response) {
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-      
-        };*/
 
   const loginService = async () => {
     axioslogin();
     //bonitaLogin();
-
-    //const cookies = new Cookies();
-    //const cok = new kks();
-    //cok.set("JSESSIONID", "JSESSIONID");
-    //cok.set("X-Bonita-API-Token", "X-Bonita-API-Token");
-    //cok.set("cookiesuno", "ljljljddddddddljljljljss");
-
-    /*let JSESSIONID = cok.get("JSESSIONID");
-    let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-    cok.set("X-Bonita", "X-Bonita", {
-      domain: "http://localhost:8080/",
-      httpOnly: false,
-    });
-
-    console.log(
-      "JSESSIONID, X_Bonita_API_Token  bonitaLogin aqui ",
-      JSESSIONID,
-      X_Bonita_API_Token
-    );
-    //cok.set("JSESSIONID", "JSESSIONID");
-    console.log(
-      "JSESSIONID, X_Bonita_API_Token  bonitaLogin aqui ",
-      JSESSIONID,
-      X_Bonita_API_Token
-    );
+    /*
     sessionStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
     sessionStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));
     localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
@@ -104,20 +61,16 @@ function App() {
     fetchCase();
   };
   const obtenerCookiesNode = async () => {
-    // bonitaLogin();
-
     let config = {
       method: "get",
       mode: "no-cors",
       url: "http://localhost:5300/bonita/login",
       headers: { "Access-Control-Allow-Origin": "*" },
     };
-    //https://jsonplaceholder.typicode.com/users/1
     const rst = await axios(config)
       .then(function(res) {
         console.log(" await axios");
         console.log(JSON.stringify(res.data));
-        //console.log(res.data);
         const data_array = JSON.stringify(res.data).split(",");
         console.log(data_array[0].split(":")[1].split(","));
         console.log(data_array[1].split(":")[1].split(","));
@@ -130,36 +83,6 @@ function App() {
       .catch(function(error) {
         console.log(error);
       });
-    //console.log(rst);
-
-    //const cookies = new Cookies();
-    //const cok = new kks();
-    //cok.set("JSESSIONID", "JSESSIONID");
-    //cok.set("X-Bonita-API-Token", "X-Bonita-API-Token");
-    //cok.set("cookiesuno", "ljljljddddddddljljljljss");
-
-    /*let JSESSIONID = cok.get("JSESSIONID");
-    let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-    cok.set("X-Bonita", "X-Bonita", {
-      domain: "http://localhost:8080/",
-      httpOnly: false,
-    });
-
-    console.log(
-      "JSESSIONID, X_Bonita_API_Token  bonitaLogin aqui ",
-      JSESSIONID,
-      X_Bonita_API_Token
-    );
-    //cok.set("JSESSIONID", "JSESSIONID");
-    console.log(
-      "JSESSIONID, X_Bonita_API_Token  bonitaLogin aqui ",
-      JSESSIONID,
-      X_Bonita_API_Token
-    );
-    sessionStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
-    sessionStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));
-    localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
-    localStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));*/
   };
   /////////////////////
   const obtenerCase = async () => {
@@ -180,7 +103,37 @@ function App() {
 
     ////////////
     axios
-      .get("/bonita/API/bpm/case/3001")
+      .get("/bonita/API/bpm/case/4001")
+      .then((resp) => {
+        let result = resp;
+        //setestupido(resp.data);
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return;
+  };
+
+  const usuarioActivo = async () => {
+    const cookies = new Cookies();
+    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
+    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
+    axios.defaults.baseURL = "http://localhost:8080";
+
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
+    console.log(
+      "axios.defaults.headers axios obtenercase",
+      axios.defaults.headers
+    );
+
+    ////////////
+    axios
+      .get("/bonita/API/system/session/unusedId")
       .then((resp) => {
         let result = resp;
         console.log(result);
@@ -190,7 +143,6 @@ function App() {
       });
     return;
   };
-
   const obtenerProcess = async () => {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
@@ -249,8 +201,10 @@ function App() {
 
   return (
     <div className="App">
+      <NavBar />
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        {/*<img src={logo} className="App-logo" alt="logo" />*/}
+
         <button
           onClick={obtenerCookiesNode}
           type="button"
@@ -266,11 +220,11 @@ function App() {
           Fetch Login
         </button>
         <button
-          onClick={unusedIdFechService}
+          onClick={usuarioActivo}
           type="button"
           className="btn btn-primary"
         >
-          Fetch unusedId
+          Axioa usuario activo
         </button>
         <button onClick={fetchCases} type="button" className="btn btn-primary">
           Case fetch
@@ -289,58 +243,6 @@ function App() {
           Get process
         </button>
       </header>
-
-      <div
-        className="btn-group"
-        role="group"
-        aria-label="Basic radio toggle button group"
-      >
-        <input
-          type="radio"
-          className="btn-check"
-          name="btnradio"
-          id="btnradio1"
-          checked={true}
-        />
-        <label className="btn btn-outline-primary">Radio 1</label>
-        <input
-          type="radio"
-          className="btn-check"
-          name="btnradio"
-          id="btnradio2"
-          checked={true}
-        />
-        <label className="btn btn-outline-primary">Radio 2</label>
-        <input
-          type="radio"
-          className="btn-check"
-          name="btnradio"
-          id="btnradio3"
-          checked={true}
-        />
-        <label className="btn btn-outline-primary">Radio 3</label>
-      </div>
-
-      <div className="btn-group-horizontal">
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-        <button type="button" className="btn btn-primary">
-          Button
-        </button>
-      </div>
     </div>
   );
 }
