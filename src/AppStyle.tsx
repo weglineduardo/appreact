@@ -36,8 +36,7 @@ function AppStyle() {
       </header>
 
       <div className="container-fluid col-12">
-        <Accordion />
-        <Accordion />
+        {/*<Accordion item="unos" />*/}
       </div>
     </div>
   );

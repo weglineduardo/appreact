@@ -1,14 +1,11 @@
-//import { useContext, useState } from "react";
-
 const axios = require("axios");
-//const Cookies = require("universal-cookie");
-//const cookies = require("es-cookie");
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 
 class BonitaApi {
   async login() {
     try {
+      // const [serviceLogin, setServiceLogin] = useState("");
       const endpoint =
         "http://localhost:8080" +
         "/bonita/loginservice?username=walter.bates&password=bpm&redirect=false";
@@ -35,7 +32,6 @@ class BonitaApi {
         .split(",")[0]
         .split("=")[1];
       console.log(JSESSIONIDNODE, XBonitaAPIToken);
-      const data = [JSESSIONIDNODE, XBonitaAPIToken];
       this.almacenarCookies();
       return { JSESSIONIDNODE, XBonitaAPIToken };
     } catch (error) {
@@ -48,19 +44,7 @@ class BonitaApi {
     let sId = "";
     let token = "";
     // return;
-    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-    const endpoint =
-      BASE_URL +
-      "/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
-    let her = {
-      /* "Content-Type": "application/json;charset=utf-8",
-      Cookie: `JSESSIONID=${JSESSIONID};X_Bonita_API_Token=${X_Bonita_API_Token}; bonita.tenant=1; BOS_Locale=en`,*/
-    };
-    her = {
-      "conntent-Type": "application/x-www-form-urlencoded",
-      Cookie:
-        "bonita.tenant=1; BOS_Locale=es ;X-Bonita-API-Token=%5B%22%5C%22ebcb520a-9862-449b-8276-9679650805d9%5C%22%7D%22%5D; JSESSIONID=5F7CCBE3B3C4A9B6BA5A87B21315FED2",
-    };
+    //const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -95,11 +79,7 @@ class BonitaApi {
   */
 
     const intance = axios.create(endpoints, requestOptions);
-    const intancec = axios.create({
-      baseURL: endpoints,
-      headers: her,
-    });
-    //console.log(intance);
+
     let res;
     try {
       res = await intance.post();
@@ -172,10 +152,6 @@ class BonitaApi {
         "Access-Control-Allow-Origin": "*",
         "X-Bonita-API-Token": `${X_Bonita_API_Token}`,
       };
-      /*  "Content-type",
-                "application/json",
-                "Cookie",
-                `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=${X_Bonita_API_Token}`;*/
       console.log("her==", her);
       const intancec = axios.create({
         baseURL: endpointc,
@@ -212,14 +188,14 @@ class BonitaApi {
     urlencoded.append("username", "walter.bates");
     urlencoded.append("password", "bpm");
     urlencoded.append("redirect", "false");
-
+    /*
     var requestOptions = {
       method: "GET",
       credentials: "include",
       headers: myHeaders,
       body: urlencoded,
       redirect: "follow",
-    };
+    };*/
   }
 
   ///acceso a controles
@@ -278,9 +254,9 @@ class BonitaApi {
     }
   }
   async loginFech() {
+    //const [serviceLogin, setServiceLogin] = useState("");
+    // const BASE_URL = process.env.REACT_APP_BASE_URL_API;
     loginFechToBonita();
-
-    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
     async function loginFechToBonita() {
       var myHeaders = new Headers();
@@ -306,9 +282,9 @@ class BonitaApi {
           if (!result.ok) {
             throw Error(result.status);
           }
+          // setServiceLogin("walter.bates.locos");
           console.log(result);
           return result;
-          //return getAuthToken();
         })
         .catch((error) => {
           console.log("error fetch", error);
@@ -356,90 +332,6 @@ class BonitaApi {
           console.log("error fetch", error);
           return error;
         });
-    }
-    async function caseBonita() {
-      const myHeaders = new Headers();
-      myHeaders.append(
-        "X-Bonita-API-Token=add93259-565e-40e3-bd12-f62d78a197ef"
-      );
-
-      const urlencoded = new URLSearchParams();
-
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        body: urlencoded,
-        redirect: "follow",
-      };
-      const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/4001";
-      console.log("BASE_URL+++++++", BASE_URL);
-      console.log("requestOptions +++++++", requestOptions);
-      console.log("myHeaders +++++++", myHeaders);
-      return await fetch(BASE_URL, requestOptions)
-        .then((result) => {
-          if (!result.ok) {
-            throw Error(result.status);
-          }
-          console.log(result);
-          return;
-          //return getAuthToken();
-        })
-        .catch((error) => {
-          console.log("error fetch", error);
-          return;
-          /*document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Login error. " + error;*/
-        });
-    }
-
-    function getAuthToken() {
-      var myHeaders = new Headers();
-      var requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        credentials: "include",
-      };
-      const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-      return fetch(BASE_URL + "/API/system/session/unusedId", requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.status);
-          }
-          return response.headers.get("x-bonita-api-token");
-        })
-        .catch((error) => {
-          document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Unable to retrieve authentication token from session. " +
-            error;
-        });
-    }
-
-    async function componentDidMount() {
-      const ufa = await fetch("http://localhost:5300/api", {
-        method: "GET", // *GET, POST, PUT, DELETE, etc.
-        mode: "no-cors", // no-cors, *cors, same-origin
-        //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-        //credentials: "same-origin", // include, *same-origin, omit
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-          "Access-Control-Allow-Origin": "http://localhost:443",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          return res;
-        })
-        .then((res) => {
-          const ressetState = {
-            url: res.url,
-            status: res.status,
-          };
-          console.log(ressetState);
-        });
-      return ufa;
     }
   }
   async caseFech() {
@@ -496,8 +388,94 @@ class BonitaApi {
 }
 export default BonitaApi;
 //module.exports = BonitaApi;
-
 /*
+    async function caseBonita() {
+      const myHeaders = new Headers();
+      myHeaders.append(
+        "X-Bonita-API-Token=add93259-565e-40e3-bd12-f62d78a197ef"
+      );
+
+      const urlencoded = new URLSearchParams();
+
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: "follow",
+      };
+      const BASE_URL =
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/4001";
+      console.log("BASE_URL+++++++", BASE_URL);
+      console.log("requestOptions +++++++", requestOptions);
+      console.log("myHeaders +++++++", myHeaders);
+      return await fetch(BASE_URL, requestOptions)
+        .then((result) => {
+          if (!result.ok) {
+            throw Error(result.status);
+          }
+          console.log(result);
+          return;
+          //return getAuthToken();
+        })
+        .catch((error) => {
+          console.log("error fetch", error);
+          return;
+          /*document.getElementById("error").innerHTML +=
+            "<br/> &#x26a0; Login error. " + error;
+        });
+    }
+
+    function getAuthToken() {
+      var myHeaders = new Headers();
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        credentials: "include",
+      };
+      const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+
+      return fetch(BASE_URL + "/API/system/session/unusedId", requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.status);
+          }
+          return response.headers.get("x-bonita-api-token");
+        })
+        .catch((error) => {
+          document.getElementById("error").innerHTML +=
+            "<br/> &#x26a0; Unable to retrieve authentication token from session. " +
+            error;
+        });
+    }
+
+    async function componentDidMount() {
+      const ufa = await fetch("http://localhost:5300/api", {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        mode: "no-cors", // no-cors, *cors, same-origin
+        //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        //credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+          "Access-Control-Allow-Origin": "http://localhost:443",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+        .then((res) => {
+          console.log(res);
+          return res;
+        })
+        .then((res) => {
+          const ressetState = {
+            url: res.url,
+            status: res.status,
+          };
+          console.log(ressetState);
+        });
+      return ufa;
+    }
+*/
+/*
+
 var axios = require("axios");
 var qs = require("qs");
 var data = qs.stringify({

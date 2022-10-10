@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import Accordion from "./screean/acordion";
 import NavBar from "./screean/navBar";
 import RadioButton from "./screean/radioButton";
@@ -13,11 +12,12 @@ import bonitaCase from "./components/bonitaCase";
 import Cookies from "universal-cookie";
 import { Cookies as kks } from "react-cookie";
 import axios from "axios";
+import Lista from "./screean/lista";
 import "./App.css";
 
 function App() {
   const [serviceLogin, setServiceLogin] = useState("");
-
+  const unas: string = serviceLogin;
   const axioslogin = async () => {
     const endpoint =
       "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
@@ -43,12 +43,6 @@ function App() {
 
   const loginService = async () => {
     axioslogin();
-    //bonitaLogin();
-    /*
-    sessionStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
-    sessionStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));
-    localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
-    localStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));*/
   };
   const unusedIdFechService = async () => {
     unusedIdFetch();
@@ -95,11 +89,6 @@ function App() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
-    console.log(
-      "axios.defaults.headers axios obtenercase",
-      axios.defaults.headers
-    );
 
     ////////////
     axios
@@ -125,13 +114,7 @@ function App() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
-    console.log(
-      "axios.defaults.headers axios obtenercase",
-      axios.defaults.headers
-    );
 
-    ////////////
     axios
       .get("/bonita/API/system/session/unusedId")
       .then((resp) => {
@@ -153,13 +136,6 @@ function App() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
-    console.log(
-      "axios.defaults.headers axios obtenercase",
-      axios.defaults.headers
-    );
-
-    ////////////
     axios
       .get(
         "/bonita/API/bpm/case?p=0&c=10&f=processDefinitionId=6726087166707818640"
@@ -192,19 +168,21 @@ function App() {
     obtenerProcess();
   };
 
-  const Message = () => {
-    const [count, setCount] = useState(0);
-    setCount(15);
-    const messageState = useState("");
-    const listState = useState([]);
-  };
-
   return (
     <div className="App">
       <NavBar />
+      <Accordion />
       <header className="App-header">
-        {/*<img src={logo} className="App-logo" alt="logo" />*/}
+        {/*<img src={logo} className="App-logo" alt="logo" />
+         <Accordion key={"hero.id"} />*/}
+      </header>
+    </div>
+  );
+}
 
+export default App;
+
+/*
         <button
           onClick={obtenerCookiesNode}
           type="button"
@@ -242,9 +220,4 @@ function App() {
         <button onClick={getProcess} type="button" className="btn btn-primary">
           Get process
         </button>
-      </header>
-    </div>
-  );
-}
-
-export default App;
+*/

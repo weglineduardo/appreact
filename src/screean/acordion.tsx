@@ -1,109 +1,108 @@
-import React from "react";
-import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
+import "../../node_modules/bootswatch/dist/yeti/bootstrap.css";
 import "bootswatch/dist/js/bootstrap";
 import "bootswatch/dist/js/bootstrap";
-//import "../App.css";
+import axios, { AxiosResponse } from "axios";
+import React, { useState, useEffect } from "react";
+import Cookies from "universal-cookie";
+import Lista from "./lista";
+import Tables from "./tables";
 
-function Accordion() {
+const Accordion = () => {
+  let valor = [];
+  const userID = 4;
+  const rsl = `JSESSIONID=${userID};X_Bonita_API_Token=${userID}; bonita.tenant=1; BOS_Locale=en`;
+
+  const [caseList, setCaseList] = useState([]);
+  const [cases, setCases] = useState([]);
+
+  const [comments, setComments] = useState([undefined]);
+
+  //console.log("Accordion", caseList[0]);
+
+  const getCaseList = async () => {
+    obtenerCaseList();
+  };
+  const obtenerCaseList = async () => {
+    const cookies = new Cookies();
+    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
+    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
+    axios.defaults.baseURL = "http://localhost:8080";
+
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+
+    axios
+      .get(
+        "bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
+      )
+      .then((resp) => {
+        let result = resp;
+
+        setCaseList(result.data);
+        console.log(result.data);
+        console.log(caseList.forEach((c) => console.log(c)));
+        console.log(result.data[0]);
+        setCases(result.data[0]);
+
+        console.log(JSON.stringify(cases));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return;
+  };
+
+  const fetchComments = async () => {
+    const response = await axios(
+      "https://jsonplaceholder.typicode.com/comments"
+    );
+    setComments(response.data);
+    console.log(comments);
+  };
+  //console.log(caseList[0]);
+  //getCaseList();
   return (
-    <div className="col-6 row">
-      <div className="accordion" id="accordionExample">
-        <div className="accordion-item">
-          <h2 className="accordion-header" id="headingOne">
-            <button
-              className="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseOne"
-              aria-expanded="false"
-              aria-controls="collapseOne"
+    <>
+      <div className="col-12 row">
+        <div className="accordion" id="accordionExample">
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="headingOne">
+              <button
+                className="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+                aria-expanded="false"
+                aria-controls="collapseOne"
+              >
+                Lista casos
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              className="accordion-collapse collapse"
+              aria-labelledby="headingOne"
+              data-bs-parent="#accordionExample"
             >
-              Accordion Item #1
-            </button>
-          </h2>
-          <div
-            id="collapseOne"
-            className="accordion-collapse collapse"
-            aria-labelledby="headingOne"
-            data-bs-parent="#accordionExample"
-          >
-            <div className="accordion-body">
-              <strong>This is the first item's accordion body.</strong> It is
-              shown by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
-            </div>
-          </div>
-        </div>
-        <div className="accordion-item">
-          <h2 className="accordion-header" id="headingTwo">
-            <button
-              className="accordion-button"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseTwo"
-              aria-expanded="true"
-              aria-controls="collapseTwo"
-            >
-              Accordion Item #2
-            </button>
-          </h2>
-          <div
-            id="collapseTwo"
-            className="accordion-collapse collapse show"
-            aria-labelledby="headingTwo"
-            data-bs-parent="#accordionExample"
-          >
-            <div className="accordion-body">
-              <strong>This is the second item's accordion body.</strong> It is
-              hidden by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
-            </div>
-          </div>
-        </div>
-        <div className="accordion-item">
-          <h2 className="accordion-header" id="headingThree">
-            <button
-              className="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseThree"
-              aria-expanded="false"
-              aria-controls="collapseThree"
-            >
-              Accordion Item #3
-            </button>
-          </h2>
-          <div
-            id="collapseThree"
-            className="accordion-collapse collapse"
-            aria-labelledby="headingThree"
-            data-bs-parent="#accordionExample"
-          >
-            <div className="accordion-body">
-              <strong>This is the third item's accordion body.</strong> It is
-              hidden by default, until the collapse plugin adds the appropriate
-              classes that we use to style each element. These classes control
-              the overall appearance, as well as the showing and hiding via CSS
-              transitions. You can modify any of this with custom CSS or
-              overriding our default variables. It's also worth noting that just
-              about any HTML can go within the <code>.accordion-body</code>,
-              though the transition does limit overflow.
+              <div className="accordion-body">
+                <Lista />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-}
+};
 
 export default Accordion;
+
+/*{JSON.stringify(
+                    cases.map((user) => (
+                      <div className="user" key={user}>
+                        {user}
+                      </div>
+                    ))
+                  )} */
