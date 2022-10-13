@@ -7,7 +7,7 @@ import bonitaLogin from "./components/bonitaLogin";
 import fetchBonitaLogin from "./components/fetchBonitaLogin";
 import fetchCase from "./components/fetchCase";
 import unusedIdFetch from "./components/unusedIdFetch";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import bonitaCase from "./components/bonitaCase";
 import Cookies from "universal-cookie";
 import { Cookies as kks } from "react-cookie";
@@ -17,7 +17,7 @@ import "./App.css";
 
 function App() {
   const [serviceLogin, setServiceLogin] = useState("");
-  const unas: string = serviceLogin;
+
   const axioslogin = async () => {
     const endpoint =
       "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
@@ -167,16 +167,25 @@ function App() {
     //bonitaLogin();
     obtenerProcess();
   };
-
+  const isLogin = () => {
+    let isd = true;
+    if (true == true) {
+      isd = false;
+    }
+    return isd;
+  };
   return (
-    <div className="App">
-      <NavBar />
-      <Accordion />
-      <header className="App-header">
-        {/*<img src={logo} className="App-logo" alt="logo" />
+    <>
+      {() => (isLogin() ? <NavBar /> : <></>)}
+      <div className="App">
+        <NavBar />
+        <Accordion />
+        <header className="App-header">
+          {/*<img src={logo} className="App-logo" alt="logo" />
          <Accordion key={"hero.id"} />*/}
-      </header>
-    </div>
+        </header>
+      </div>
+    </>
   );
 }
 

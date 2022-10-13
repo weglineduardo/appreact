@@ -5,47 +5,66 @@ import fetchBonitaLogin from "../components/fetchBonitaLogin";
 import fetchCase from "../components/fetchCase";
 import unusedIdFetch from "../components/unusedIdFetch";
 import React, { useState, useEffect } from "react";
+
+import { iUsuario } from "../interfaces/usuario";
 import bonitaCase from "../components/bonitaCase";
 import "../../node_modules/bootswatch/dist/yeti/bootstrap.css";
 import "bootswatch/dist/js/bootstrap";
 import Accordion from "./acordion";
 import { idText } from "typescript";
+import { JsonSerializer } from "typescript-json-serializer";
+import { JsonConvert } from "json2typescript";
 
 //import "../App.css";
 
 function NavBar() {
-  interface thecomment {
-    postId: string;
-    id: string;
-    name: string;
-    email: string;
-    body: string;
+  type iUarioActivo = iUsuario;
+  class rs {
+    "copyright": string;
+    "is_guest_user": string;
+    "branding_version": string;
+    "branding_version_with_date": string;
+    "user_id": string;
+    "user_name": string;
+    "session_id": string;
+    "conf": string;
+    "is_technical_user": string;
+    "version": string;
   }
 
   const [serviceLogin, setServiceLogin] = useState("");
+  const [usuario, setUsuario] = useState<iUarioActivo>();
   const [caseList, setCaseList] = useState([]);
-  const [comments, setComments] = useState([]);
+  let defaultSerializer = new JsonSerializer();
+  let jsonConvert: JsonConvert = new JsonConvert();
+
   useEffect(() => {
     //console.log(caseList.forEach((c) => console.log(c)));
   }, [caseList]);
 
   //#region Login
   const fetchLoginService = async () => {
-    loginFetch();
+    loginFetch("walter.bates", "bpm");
+    usuarioActivo();
+
+    /*usuario?.branding_version &&
+      console.log("is_guest_user", usuario?.branding_version);
+    const is_guest_user = (usuario?.branding_version, "que onda");
+    console.log("is_guest_user", is_guest_user);*/
   };
 
-  const loginFetch = async () => {
-    loginFechToBonita();
+  const loginFetch = async (username: string, password: string) => {
+    loginFechToBonita(username, password);
 
     const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
-    async function loginFechToBonita() {
+    async function loginFechToBonita(username: string, password: string) {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
       var urlencoded = new URLSearchParams();
-      urlencoded.append("username", "walter.bates");
-      urlencoded.append("password", "bpm");
+      urlencoded.append("username", username);
+      urlencoded.append("password", password);
       urlencoded.append("redirect", "false");
 
       const RequestInit: RequestInit = {
@@ -63,18 +82,13 @@ function NavBar() {
       await fetch(BASE_URL, RequestInit)
         .then((result) => {
           if (!result.ok) {
+            setServiceLogin("Error de Login");
             throw Error(result.status.toString());
           }
           /*result.json().then((json) => {
             console.log("result.body jsom = ", json);
           });*/
-          setServiceLogin(
-            "walter.bates"
-            //result.url
-            //{result.headers.get("X-Bonita-API-Token")}
-            /*JSON.stringify(result.headers.get("X-Bonita-API-Token")) +
-              "result.status.toString());"*/
-          );
+          setServiceLogin("Login Success");
 
           console.log(result);
           return result;
@@ -106,6 +120,7 @@ function NavBar() {
         //console.log("resp JSON.stringif = ", JSON.stringify(resp));
         let result = resp; //resp.data;
         setServiceLogin("");
+        setUsuario(undefined);
         console.log(result);
       })
       .catch((error) => {
@@ -118,9 +133,6 @@ function NavBar() {
 
   //#region usuario activo
   const usuarioActivo = async () => {
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
     axios.defaults.baseURL = "http://localhost:8080";
 
     axios.defaults.headers.post["Content-Type"] =
@@ -131,8 +143,29 @@ function NavBar() {
       .get("/bonita/API/system/session/unusedId")
       .then((resp) => {
         let result = resp;
-        setServiceLogin(result.statusText);
-        console.log(result);
+        setUsuario(result.data);
+
+        let rr = jsonConvert.deserializeObject(result.data, rs);
+        console.log("rr", usuario ? usuario.branding_version : "sin datos");
+        /*const rr: iUsuario = result.data;
+        const dataz = defaultSerializer.serialize(result.data);
+        console.log("dataz", dataz);
+        const name = defaultSerializer.deserializeObject<iUarioActivo>(
+          result.data,
+          rr
+        );
+        console.log(
+          "name",
+          name?.session_id,
+          name?.session_id,
+          "name?.session_id"
+        );*/
+        /*let resultdata = jsonConvert.deserializeObject<iUsuario>(result.data);
+        let leusuario = jsonConvert.deserializeObject<iUsuario>(usuario);
+
+        console.log(resultdata.branding_version_with_date, "stringify");*/
+
+        console.log(result.data);
       })
       .catch((error) => {
         console.log(error);
@@ -184,9 +217,6 @@ function NavBar() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-
-    //bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0
-    // "bonita/portal/resource/app/userAppBonita/case-list/API/bpm/process?c=9999&"
     axios
       .get(
         "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
@@ -244,43 +274,6 @@ function NavBar() {
   //#region otro
   //#endregion
 
-  const obtenercomment = async () => {
-    axios.defaults.baseURL = "https://jsonplaceholder.typicode.com";
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-
-    axios
-      .get<never[]>("/comments")
-      .then((response) => {
-        //console.log(response.data);
-        setComments(response.data[0]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  };
-  const eta = () => {
-    const data = [
-      { id: 1, name: "John Doe" },
-      { id: 2, name: "Victor Wayne" },
-      { id: 3, name: "Jane Doe" },
-    ];
-    console.log(data);
-    return (
-      <div className="">
-        {data.map((user) => (
-          <div className="user" key={user.id}>
-            {user.name}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -308,6 +301,11 @@ function NavBar() {
                   <span className="visually-hidden">(current)</span>
                 </a>
               </li>
+              <li className="nav-item">
+                <a className="nav-link" href="/home">
+                  home
+                </a>
+              </li>
               <li className="nav-item" onClick={getCaseList}>
                 <a className="nav-link" href="#">
                   Lista Casos
@@ -333,7 +331,6 @@ function NavBar() {
                   Login
                 </a>
               </li>
-
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
@@ -361,7 +358,12 @@ function NavBar() {
                   </a>
                 </div>
               </li>
-              <h6>{serviceLogin}</h6>
+              <h6 className="text-succes">
+                {serviceLogin}{" "}
+                {JSON.stringify(
+                  usuario ? usuario.user_name : "Necesita loguearse"
+                )}
+              </h6>
             </ul>
             {/*<form className="d-flex">
       <input

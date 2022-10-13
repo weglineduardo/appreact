@@ -9,11 +9,13 @@ import axios, { AxiosResponse } from "axios";
 import { kMaxLength } from "buffer";
 import { ClasesApi } from "../clases/clasesApi";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
+import { iCase } from "../interfaces/case";
 
 function Lista() {
   type listCaseForClient = iListCaseForClient;
   const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
-
+  type caseId = iCase;
+  const [caseid, setCaseid] = useState<caseId[]>([]);
   let defaultSerializer = new JsonSerializer();
   let jsonConvert: JsonConvert = new JsonConvert();
   const [comments, setComments] = useState([undefined]);
@@ -21,8 +23,9 @@ function Lista() {
   const [jcomments, setjComments] = useState([undefined]);
   useEffect(() => {
     obtenerCaseList;
+    caseForId;
     // fetchComments();
-  }, [caseList]);
+  }, [caseList, caseid]);
   useEffect(() => {
     //console.log(comments);
   }, [comments]);
@@ -50,7 +53,31 @@ function Lista() {
       });
     return;
   };
+
+  //#region obtenerArchivedActivity
   const obtenerArchivedActivity = async () => {
+    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    axios
+      .get(
+        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&t=0"
+      )
+      .then((resp) => {
+        let result = resp;
+        //setCaseList(result.data);
+        console.log("obtenerArchivedActivity", result.data);
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    return;
+  };
+  //#endregion
+  //#region caseForId
+  const caseForId = async (id: string) => {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
@@ -61,19 +88,21 @@ function Lista() {
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
-      .get(
-        "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
-      )
+      .get("/bonita/API/bpm/case/" + id)
       .then((resp) => {
         let result = resp;
-        setCaseList(result.data);
-        console.log(result.data);
+        setCaseid(result.data);
+        console.log("setCaseId", caseid);
+
+        setCaseid(result.data);
       })
       .catch((error: any) => {
         console.log(error);
       });
     return;
   };
+  //#endregion
+
   return (
     <>
       <ul className="nav nav-tabs" role="tablist">
@@ -96,6 +125,7 @@ function Lista() {
             href="#profile"
             aria-selected="false"
             role="tab"
+            onClick={obtenerArchivedActivity}
             tabIndex={-1}
           >
             Casos archivados
@@ -103,37 +133,11 @@ function Lista() {
         </li>
       </ul>
       <div id="myTabContent" className="tab-content">
-        <div className="tab-pane fade active show" id="home" role="tabpanel">
-          <table className="table table-hover table-success table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Id</th>
-                <th scope="col">Nombre proceso</th>
-                <th scope="col">Iniciado por</th>
-                <th scope="col">Fecha inicio</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {caseList.map((list) => (
-                <tr className="table-light">
-                  <td>{list.id}</td>
-                  <td>{list.processDefinitionId.displayName}</td>
-                  <td>
-                    {list.startedBySubstitute.firstname}{" "}
-                    {list.startedBySubstitute.lastname}{" "}
-                  </td>
-                  <td>{list.start}</td>
-                  <td>
-                    <button className="btn btn-outline-info btn-sm ">
-                      Mas
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <div
+          className="tab-pane fade active show"
+          id="home"
+          role="tabpanel"
+        ></div>
         <div className="tab-pane fade " id="profile" role="tabpanel">
           <div className="row">
             <div className="column">
@@ -142,7 +146,7 @@ function Lista() {
                 className="btn btn-info text-right"
                 onClick={obtenerArchivedActivity}
               >
-                Refrescar
+                traer casos archivados
               </button>
             </div>
             <div className="column">
@@ -210,7 +214,10 @@ function Lista() {
             <div className="col-1">
               <div>
                 {" "}
-                <button className="btn btn-outline-info btn-sm align-text-bottom">
+                <button
+                  onClick={() => caseForId(list.id)}
+                  className="btn btn-outline-info btn-sm align-text-bottom"
+                >
                   {" "}
                   Ver{" "}
                 </button>{" "}
@@ -224,7 +231,35 @@ function Lista() {
 }
 
 export default Lista;
-
+/**          <table className="table table-hover table-success table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Nombre proceso</th>
+                <th scope="col">Iniciado por</th>
+                <th scope="col">Fecha inicio</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {caseList.map((list) => (
+                <tr className="table-light">
+                  <td>{list.id}</td>
+                  <td>{list.processDefinitionId.displayName}</td>
+                  <td>
+                    {list.startedBySubstitute.firstname}{" "}
+                    {list.startedBySubstitute.lastname}{" "}
+                  </td>
+                  <td>{list.start}</td>
+                  <td>
+                    <button className="btn btn-outline-info btn-sm ">
+                      Mas
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table> */
 /*  const fetchComments = async () => {
     setComments([]);
     const response = await Axios(

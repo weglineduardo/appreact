@@ -1,4 +1,4 @@
-export interface Case {
+export interface iCase {
   end_date: string;
   searchIndex5Label: string;
   processDefinitionId: string;

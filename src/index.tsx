@@ -5,21 +5,20 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Lista from "./screean/lista";
 
+import { BrowserRouter } from "react-router-dom";
+import AppRouter from "./AppRouter";
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
-const ll = document.cookie;
-function getJSessionId() {
-  //document.cookie = "JSESSIONID=John";
-  let jsId = document.cookie.match(/JSESSIONID=[^;]+/);
-  return jsId;
-}
 
-const ll2 = getJSessionId();
 root.render(
-  <React.StrictMode>
+  <BrowserRouter>
+    <AppRouter />
+  </BrowserRouter>
+  /*<React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>*/
 );
 
 // If you want to start measuring performance in your app, pass a function
