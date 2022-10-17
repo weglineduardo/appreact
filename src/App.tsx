@@ -14,6 +14,7 @@ import { Cookies as kks } from "react-cookie";
 import axios from "axios";
 import Lista from "./screean/lista";
 import "./App.css";
+import NavBarMaster from "./screean/NavBarMaster";
 
 function App() {
   const [serviceLogin, setServiceLogin] = useState("");
@@ -176,7 +177,6 @@ function App() {
   };
   return (
     <>
-      {() => (isLogin() ? <NavBar /> : <></>)}
       <div className="App">
         <NavBar />
         <Accordion />
@@ -192,6 +192,7 @@ function App() {
 export default App;
 
 /*
+      {() => (isLogin() ? <NavBar /> : <></>)}
         <button
           onClick={obtenerCookiesNode}
           type="button"

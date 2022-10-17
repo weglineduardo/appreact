@@ -1,11 +1,15 @@
-import "../../node_modules/bootswatch/dist/yeti/bootstrap.css";
-import "bootswatch/dist/js/bootstrap";
+import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 import axios, { AxiosResponse } from "axios";
 import React, { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
 import Lista from "./lista";
 import Tables from "./tables";
+import ListItems from "../components/ListItems";
+import Modals from "./modal";
+import Children from "./child";
+import ButtonComponent from "../components/nave";
+import CaseById from "./caseById";
 
 const Accordion = () => {
   let valor = [];
@@ -63,6 +67,16 @@ const Accordion = () => {
   };
   //console.log(caseList[0]);
   //getCaseList();
+  const information = { number: 25, name: "props" };
+  const funSum = () => {
+    return 33 + 2;
+  };
+  /*const [visibilidad, setVisibilidad] = useState(false);
+  const traercomponente = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setVisibilidad(true);
+  };
+  <ButtonComponent />;*/
   return (
     <>
       <div className="col-12 row">
@@ -77,7 +91,7 @@ const Accordion = () => {
                 aria-expanded="false"
                 aria-controls="collapseOne"
               >
-                Lista casos
+                Lista de casos
               </button>
             </h2>
             <div
@@ -99,7 +113,19 @@ const Accordion = () => {
 
 export default Accordion;
 
-/*{JSON.stringify(
+/*
+
+      <Children
+        title={"title"}
+        content={"content"}
+        information={information}
+        sum={funSum}
+      />
+      <button className="btn btn-succes" onClick={() => traercomponente}>
+        traer componente
+      </button>
+      
+{JSON.stringify(
                     cases.map((user) => (
                       <div className="user" key={user}>
                         {user}

@@ -22,15 +22,19 @@ import About from "./components/about";
 import Contact from "./components/contact";
 import App from "./App";
 import Login from "./components/login";
+import CaseById from "./screean/caseById";
+import CaseArchivedById from "./screean/caseArchivedById";
 
 function AppRouter() {
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="home" element={<Home />} />
+        <Route path="home" element={<App />} />
         <Route path="app" element={<App />} />
         <Route path="navbar" element={<NavBar />} />
+
+        <Route path="casebyid" element={<CaseById />} />
       </Routes>
     </div>
   );

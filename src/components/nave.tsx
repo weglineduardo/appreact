@@ -16,9 +16,15 @@ import "bootswatch/dist/js/bootstrap";
 import { idText } from "typescript";
 import { JsonSerializer } from "typescript-json-serializer";
 import { JsonConvert, ValueCheckingMode } from "json2typescript";
-import ButtonComponent from "./nave";
-import LoginFc from "./loginfc";
-function Login() {
+
+const ButtonComponent = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    //fetchLoginService;
+
+    navigate("/app");
+  };
   //#region tipos y clases
 
   const mapDiv = useRef("--");
@@ -47,35 +53,20 @@ function Login() {
   let defaultSerializer = new JsonSerializer();
   let jsonConvert: JsonConvert = new JsonConvert();
   //#region
-
   //#region Login
-  const [visibilidad, setVisibilidad] = useState(false);
-  const traercomponente = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    console.log(visibilidad);
-    setVisibilidad(!visibilidad);
-
-    console.log(visibilidad);
-  };
-  const fetchLoginService = () => {
+  const fetchLoginService = async () => {
     loginFetch(inputUsuario, inputPass);
-    usuarioActivo;
-    handleClick();
-    //console.log(serviceLogin);
+    usuarioActivo();
 
     /*usuario?.branding_version &&
       console.log("is_guest_user", usuario?.branding_version);
     const is_guest_user = (usuario?.branding_version, "que onda");
     console.log("is_guest_user", is_guest_user);*/
   };
-
-  const handleClick = () => {
-    console.log("/app");
-    const navigate = useNavigate();
-    navigate("/app");
-  };
   const loginFetch = async (username: string, password: string) => {
     loginFechToBonita(username, password);
+
+    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
 
     async function loginFechToBonita(username: string, password: string) {
       const myHeaders = new Headers();
@@ -108,9 +99,8 @@ function Login() {
             console.log("result.body jsom = ", json);
           });*/
           setServiceLogin("Login Success");
-          console.log(result);
 
-          console.log("serviceLogin", serviceLogin);
+          console.log(result);
           return result;
         })
         .catch((error) => {
@@ -128,7 +118,7 @@ function Login() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    await axios
+    axios
       .get("/bonita/API/system/session/unusedId")
       .then((resp) => {
         let result = resp;
@@ -137,6 +127,7 @@ function Login() {
         let rr = jsonConvert.deserializeObject(result.data, rs);
         console.log("rr", usuario ? usuario.branding_version : "sin datos");
         console.log(result.data);
+        handleClick;
       })
       .catch((error) => {
         console.log(error);
@@ -144,95 +135,14 @@ function Login() {
     return;
   };
   //#endregion
-  const naver = () => {
-    const navigate = useNavigate();
 
-    const handleClick = () => {
-      navigate("/app");
-    };
-
-    return (
-      <div>
-        <button onClick={handleClick} type="button">
-          {" "}
-          acaa es{" "}
-        </button>
-        <button onClick={handleClick} type="button" />
-      </div>
-    );
-  };
   return (
-    <>
-      <div className="position-absolute top-50 start-50 translate-middle ">
-        {" "}
-        <div className="login-container ">
-          {" "}
-          <div className="">
-            {" "}
-            <div className=" shadow p-2 mb-3 bg-secundary ">
-              <div className="card text-white bg-primary mb-3">
-                <div className="card-header">Portal </div>
-                <div className="card-body">
-                  <h4 className="card-title">Login</h4>
-                  <div className="">
-                    <form>
-                      <fieldset>
-                        <div className="form-group">
-                          <label className="form-label mt-4">Usuario</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="usuario"
-                            aria-describedby="emailHelp"
-                            placeholder="Usuario"
-                            onChange={(e) => setInputUsuario(e.target.value)}
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label className="form-label mt-4">Contraseña</label>
-                          <input
-                            itemID="password"
-                            type="password"
-                            className="form-control"
-                            id="password"
-                            placeholder="Contraseña"
-                            onChange={(e) => setInputpPass(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="form-group ">
-                          <h4 className="card-title"></h4>
-                          <ButtonComponent />
-                          {/*{visibilidad ? <ButtonComponent /> : null}
-
-                          <button
-                            className="btn btn-succes"
-                            onClick={traercomponente}
-                          >
-                            traer componente
-                          </button>*/}
-                          {/*    
-                          <label className="form-label mt-4"></label>
-                                                <button
-                            className="btn btn-succes"
-                            onClick={fetchLoginService}
-                          >
-                            Ingresar
-                          </button>*/}
-                        </div>
-                      </fieldset>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>{" "}
-          </div>{" "}
-        </div>
-      </div>
-
-      {/*<LoginFc />*/}
-    </>
+    <div>
+      <button className="btn btn-succes" onClick={handleClick}>
+        Ingresar
+      </button>
+    </div>
   );
-}
+};
 
-export default Login;
+export default ButtonComponent;

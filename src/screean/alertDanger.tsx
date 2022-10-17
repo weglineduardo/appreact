@@ -1,6 +1,5 @@
 import React from "react";
-import "../../node_modules/bootswatch/dist/yeti/bootstrap.css";
-import "bootswatch/dist/js/bootstrap";
+import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 //import "../App.css";
 

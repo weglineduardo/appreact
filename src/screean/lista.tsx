@@ -10,9 +10,17 @@ import { kMaxLength } from "buffer";
 import { ClasesApi } from "../clases/clasesApi";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
 import { iCase } from "../interfaces/case";
+import Modals from "./modal";
+import CaseById from "./caseById";
+import { formatearFecha } from "../components/formatoFecha";
 
 function Lista() {
   type listCaseForClient = iListCaseForClient;
+  //usamos listCaseForClient para setArchivedCaseList y
+  //tambien para setCaseList por que son los mismo atributos
+  const [archivedCaseList, setArchivedCaseList] = useState<listCaseForClient[]>(
+    []
+  );
   const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
   type caseId = iCase;
   const [caseid, setCaseid] = useState<caseId[]>([]);
@@ -67,8 +75,8 @@ function Lista() {
       )
       .then((resp) => {
         let result = resp;
-        //setCaseList(result.data);
-        console.log("obtenerArchivedActivity", result.data);
+        setArchivedCaseList(result.data);
+        console.log("setArchivedCaseList", result.data);
       })
       .catch((error: any) => {
         console.log(error);
@@ -115,7 +123,7 @@ function Lista() {
             role="tab"
             onClick={obtenerCaseList}
           >
-            Casos activos
+            Casos abiertos
           </a>
         </li>
         <li className="nav-item" role="presentation">
@@ -133,32 +141,125 @@ function Lista() {
         </li>
       </ul>
       <div id="myTabContent" className="tab-content">
-        <div
-          className="tab-pane fade active show"
-          id="home"
-          role="tabpanel"
-        ></div>
-        <div className="tab-pane fade " id="profile" role="tabpanel">
+        <div className="tab-pane fade active show" id="home" role="tabpanel">
           <div className="row">
+            {" "}
+            <div className="column"></div>
             <div className="column">
-              {" "}
-              <button
-                className="btn btn-info text-right"
-                onClick={obtenerArchivedActivity}
-              >
-                traer casos archivados
-              </button>
-            </div>
-            <div className="column">
-              <p>Estos son casos archivados</p>
+              <div className="row"></div>
+
+              <p>Estos son casos abiertos</p>
+              {caseList.map((list) => (
+                <div className="container ">
+                  <div className="row shadow p-2 mb-3 bg-white rounded">
+                    <div className="col">
+                      <div>Id </div>
+                      <div>{list.id} </div>
+                    </div>
+                    <div className="col">
+                      <div> Nombre proceso </div>
+                      <div>{list.processDefinitionId.displayName} </div>
+                    </div>
+                    <div className="col">
+                      <div>Iniciado por </div>
+                      <div>
+                        {" "}
+                        {list.startedBySubstitute.firstname}{" "}
+                        {list.startedBySubstitute.lastname}{" "}
+                      </div>
+                    </div>
+                    <div className="col">
+                      {" "}
+                      <div>Fecha inicio</div>
+                      <div>{formatearFecha(list.start)} </div>
+                    </div>
+                    <div className="col">
+                      <div>Tareas</div>
+                      <div>{list.id} </div>
+                    </div>
+                    <div className="col">
+                      <div>
+                        {" "}
+                        <button
+                          onClick={() => caseForId(list.id)}
+                          className="btn btn-outline-info btn-sm align-text-bottom"
+                        >
+                          {" "}
+                          Ver{" "}
+                        </button>{" "}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <table className="table table-hover table-success table-striped">
+        </div>
+        <div className="tab-pane fade " id="profile" role="tabpanel">
+          <div className="row">
+            <div className="column"></div>
+            <div className="column">
+              <p>Estos son casos archivados</p>
+
+              {archivedCaseList.map((list) => (
+                <div className="container">
+                  <div className="row shadow p-2 mb-3 bg-white rounded">
+                    <div className="col-1">
+                      <div>Id </div>
+                      <div>{list.id} </div>
+                    </div>
+                    <div className="col-1">
+                      <div> Proceso </div>
+                      <div>{list.processDefinitionId.displayName} </div>
+                    </div>
+                    <div className="col-3">
+                      <div>Iniciado por </div>
+                      <div>
+                        {" "}
+                        {list.startedBySubstitute.firstname}{" "}
+                        {list.startedBySubstitute.lastname}{" "}
+                      </div>
+                    </div>
+                    <div className="col-3">
+                      {" "}
+                      <div>Fecha inicio</div>
+                      <div>{formatearFecha(list.start)} </div>
+                    </div>
+                    <div className="col-3">
+                      <div>Fecha fin</div>
+                      <div>{formatearFecha(list.end_date)}</div>
+                    </div>
+                    <div className="col-1">
+                      <div>
+                        <Modals id={list.id} />{" "}
+                        <button
+                          onClick={() => caseForId(list.id)}
+                          className="btn btn-outline-info btn-sm align-text-bottom"
+                        >
+                          {" "}
+                          Ver{" "}
+                        </button>{" "}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default Lista;
+
+/*          <table className="table table-hover table-success table-striped">
             <thead>
               <tr></tr>
             </thead>
             <tbody>
-              {caseList.map((list) => (
+              {archivedCaseList.map((list) => (
                 <tr className="table-light">
                   <td>
                     <div className="card border-warning mb-3">
@@ -167,7 +268,7 @@ function Lista() {
                       </div>
                       <div className="card-body">
                         <h4 className="card-title">
-                          {list.id} {list.start}
+                          {list.id} {formatearFecha(list.start)} 
                         </h4>
                         <p className="card-text">
                           {list.startedBySubstitute.firstname}{" "}
@@ -179,58 +280,7 @@ function Lista() {
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
-      </div>
-
-      {caseList.map((list) => (
-        <div className="container">
-          <div className="row shadow p-3 mb-5 bg-white rounded ">
-            <div className="col-1">
-              <div>Id </div>
-              <div>{list.id} </div>
-            </div>
-            <div className="col-2">
-              <div> Nombre proceso </div>
-              <div>{list.processDefinitionId.displayName} </div>
-            </div>
-            <div className="col-3">
-              <div>Iniciado por </div>
-              <div>
-                {" "}
-                {list.startedBySubstitute.firstname}{" "}
-                {list.startedBySubstitute.lastname}{" "}
-              </div>
-            </div>
-            <div className="col-4">
-              {" "}
-              <div>Fecha inicio</div>
-              <div>{list.start} </div>
-            </div>
-            <div className="col-1">
-              <div>Tareas</div>
-              <div>{list.id} </div>
-            </div>
-            <div className="col-1">
-              <div>
-                {" "}
-                <button
-                  onClick={() => caseForId(list.id)}
-                  className="btn btn-outline-info btn-sm align-text-bottom"
-                >
-                  {" "}
-                  Ver{" "}
-                </button>{" "}
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-}
-
-export default Lista;
+          </table> */
 /**          <table className="table table-hover table-success table-striped">
             <thead>
               <tr>
@@ -250,7 +300,7 @@ export default Lista;
                     {list.startedBySubstitute.firstname}{" "}
                     {list.startedBySubstitute.lastname}{" "}
                   </td>
-                  <td>{list.start}</td>
+                  <td>{formatearFecha(list.start)} </td>
                   <td>
                     <button className="btn btn-outline-info btn-sm ">
                       Mas
@@ -341,7 +391,7 @@ export default Lista;
                   {list.startedBySubstitute.firstname}{" "}
                   {list.startedBySubstitute.lastname}{" "}
                 </td>
-                <td>{list.start}</td>
+                <td>{formatearFecha(list.start)} </td>
                 <td>
                   <button className="btn btn-outline-info btn-sm ">Mas</button>
                 </td>

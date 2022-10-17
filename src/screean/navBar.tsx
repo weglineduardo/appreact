@@ -1,14 +1,12 @@
 import Cookies from "universal-cookie";
-import { Cookies as kks } from "react-cookie";
 import axios, { AxiosResponse } from "axios";
-import fetchBonitaLogin from "../components/fetchBonitaLogin";
 import fetchCase from "../components/fetchCase";
 import unusedIdFetch from "../components/unusedIdFetch";
 import React, { useState, useEffect } from "react";
 
 import { iUsuario } from "../interfaces/usuario";
 import bonitaCase from "../components/bonitaCase";
-import "../../node_modules/bootswatch/dist/yeti/bootstrap.css";
+import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 import Accordion from "./acordion";
 import { idText } from "typescript";
@@ -88,7 +86,7 @@ function NavBar() {
           /*result.json().then((json) => {
             console.log("result.body jsom = ", json);
           });*/
-          setServiceLogin("Login Success");
+          setServiceLogin("Login Success " + username);
 
           console.log(result);
           return result;
@@ -296,14 +294,9 @@ function NavBar() {
           <div className="collapse navbar-collapse" id="navbarColor01">
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <a className="nav-link active" href="#">
+                <a className="nav-link active" href="/app">
                   Home
                   <span className="visually-hidden">(current)</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/home">
-                  home
                 </a>
               </li>
               <li className="nav-item" onClick={getCaseList}>
@@ -340,29 +333,76 @@ function NavBar() {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Estadisticas
+                  Casos
                 </a>
                 <div className="dropdown-menu" id="usuario">
-                  <a className="dropdown-item" href="#">
-                    Item uno
+                  <a className="dropdown-item" href="/app">
+                    Todos los casos
                   </a>
-                  <a className="dropdown-item" href="#">
-                    Item dos
-                  </a>
-                  <a className="dropdown-item" href="#">
-                    Item tres
-                  </a>
+
+                  <div>
+                    <li className="dropdown-submenu">
+                      <a className="dropdown-item dropdown-toggle" href="">
+                        Buscar
+                      </a>
+                      <ul className="dropdown-menu">
+                        {/*<li>
+                          <a className="dropdown-item" href="#">
+                            Abiertos por id
+                          </a>
+                        </li>
+                        <li>
+                          <a className="dropdown-item" href="#">
+                            Archivados por id
+                          </a>
+                         </li>*/}
+                        <li className="dropdown-submenu">
+                          <a className="dropdown-item dropdown-toggle" href="#">
+                            Abiertos
+                          </a>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a className="dropdown-item" href="casebyid">
+                                Por id
+                              </a>
+                            </li>
+                            <li>
+                              <a className="dropdown-item" href="#">
+                                Por proceso
+                              </a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li className="dropdown-submenu">
+                          <a className="dropdown-item dropdown-toggle" href="#">
+                            Archivados
+                          </a>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a className="dropdown-item" href="#">
+                                Por id
+                              </a>
+                            </li>
+                            <li>
+                              <a className="dropdown-item" href="#">
+                                Por Proceso
+                              </a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </div>
+
                   <div className="dropdown-divider"></div>
                   <a className="dropdown-item" href="#">
-                    Item otros
+                    Ayuda
                   </a>
                 </div>
               </li>
               <h6 className="text-succes">
-                {serviceLogin}{" "}
-                {JSON.stringify(
-                  usuario ? usuario.user_name : "Necesita loguearse"
-                )}
+                {serviceLogin}
+                {/* {JSON.stringify(usuario ? usuario.user_name : " ")}*/}
               </h6>
             </ul>
             {/*<form className="d-flex">
