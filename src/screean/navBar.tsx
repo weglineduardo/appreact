@@ -294,7 +294,7 @@ function NavBar() {
           <div className="collapse navbar-collapse" id="navbarColor01">
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <a className="nav-link active" href="/app">
+                <a className="nav-link active" href="/home">
                   Home
                   <span className="visually-hidden">(current)</span>
                 </a>
@@ -367,7 +367,10 @@ function NavBar() {
                               </a>
                             </li>
                             <li>
-                              <a className="dropdown-item" href="#">
+                              <a
+                                className="dropdown-item"
+                                href="caseByNameProcess"
+                              >
                                 Por proceso
                               </a>
                             </li>
@@ -379,12 +382,18 @@ function NavBar() {
                           </a>
                           <ul className="dropdown-menu">
                             <li>
-                              <a className="dropdown-item" href="#">
+                              <a
+                                className="dropdown-item"
+                                href="casearchivedbyid"
+                              >
                                 Por id
                               </a>
                             </li>
                             <li>
-                              <a className="dropdown-item" href="#">
+                              <a
+                                className="dropdown-item"
+                                href="caseArchivedByNameProcess"
+                              >
                                 Por Proceso
                               </a>
                             </li>

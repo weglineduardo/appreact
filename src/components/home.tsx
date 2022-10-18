@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-function Home() {
+function Homed() {
   return (
     <>
       <div>
@@ -13,4 +13,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Homed;

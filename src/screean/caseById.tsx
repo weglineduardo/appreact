@@ -1,19 +1,15 @@
-//import "./App.css";
-import Axios from "axios";
 import React, { useState, useEffect } from "react";
 import { JsonSerializer, throwError } from "typescript-json-serializer";
-import { JsonObject, JsonProperty } from "json2typescript";
+
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
-import { kMaxLength } from "buffer";
-import { ClasesApi } from "../clases/clasesApi";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
 import { iCase } from "../interfaces/case";
 import Modals from "./modal";
 import NavBar from "./navBar";
 import Accordion from "./acordion";
-import ListaCasosActivos from "./listaCasosActivos";
+import ListaCasosActivos from "./casoActivoId";
 
 function CaseById() {
   type listCaseForClient = iListCaseForClient;

@@ -1,40 +1,36 @@
-import Accordion from "./screean/acordion";
 import NavBar from "./screean/navBar";
-import RadioButton from "./screean/radioButton";
-import CheckBox from "./screean/checkBox";
-import DataBsTarget from "./screean/dataBsTarget";
-import bonitaLogin from "./components/bonitaLogin";
-import fetchBonitaLogin from "./components/fetchBonitaLogin";
-import fetchCase from "./components/fetchCase";
-import unusedIdFetch from "./components/unusedIdFetch";
 import React, { useState, Component } from "react";
-import bonitaCase from "./components/bonitaCase";
-import Cookies from "universal-cookie";
-import { Cookies as kks } from "react-cookie";
-import axios from "axios";
+
 import { Route, Link } from "react-router-dom";
 
 import { Path, Routes } from "react-router";
-import Lista from "./screean/lista";
 import "./App.css";
-import Home from "./components/home";
-import About from "./components/about";
-import Contact from "./components/contact";
 import App from "./App";
 import Login from "./components/login";
 import CaseById from "./screean/caseById";
 import CaseArchivedById from "./screean/caseArchivedById";
+import casoActivoPorNombreProceso from "./screean/casoActivoPorNombreProceso";
+import CasoActivoPorNombreProceso from "./screean/casoActivoPorNombreProceso";
+import CaseByNameProcess from "./screean/caseByNameProcess";
+import CaseArchivedByNameProcess from "./screean/caseArchivedByNameProcess";
+import Home from "./screean/home";
 
 function AppRouter() {
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="home" element={<App />} />
+        <Route path="home" element={<Home />} />
         <Route path="app" element={<App />} />
         <Route path="navbar" element={<NavBar />} />
-
         <Route path="casebyid" element={<CaseById />} />
+        <Route path="caseByNameProcess" element={<CaseByNameProcess />} />
+        <Route path="casearchivedbyid" element={<CaseArchivedById />} />
+        <Route path="casearchivedbyid" element={<CaseArchivedById />} />
+        <Route
+          path="caseArchivedByNameProcess"
+          element={<CaseArchivedByNameProcess />}
+        />
       </Routes>
     </div>
   );

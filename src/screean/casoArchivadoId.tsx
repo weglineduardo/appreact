@@ -1,108 +1,99 @@
-import Moment from "moment";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { JsonSerializer, throwError } from "typescript-json-serializer";
-import { JsonObject, JsonProperty } from "json2typescript";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
-import { kMaxLength } from "buffer";
-import { ClasesApi } from "../clases/clasesApi";
+import { iCase } from "../interfaces/case";
+import { formatearFecha } from "../components/formatoFecha";
 import {
-  iListCaseForClient,
+  iArchivedCase,
   ProcessDefinitionId,
   StartedBy,
   StartedBySubstitute,
-} from "../interfaces/listCaseClient";
-import { iCase } from "../interfaces/case";
-import { getNameOfDeclaration } from "typescript";
-import { formatearFecha } from "../components/formatoFecha";
-import NavBar from "./navBar";
-import Modals from "./modal";
+} from "../interfaces/archivedCase";
 
-function ListaCasosActivos() {
-  type listCaseForClient = iListCaseForClient;
-  //usamos listCaseForClient para setArchivedCaseList y
-  //tambien para setCaseList por que son los mismo atributos
-  const [archivedCaseList, setArchivedCaseList] = useState<listCaseForClient[]>(
-    []
-  );
+function CasoArchivadoId() {
+  type archivedCase = iArchivedCase;
 
-  const [isVisible, setisVisible] = useState(false);
-  const [inputId, setInputId] = useState<string>("1");
-  const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
-  type caseId = iCase;
-  let startedBySubstitute: StartedBySubstitute = {
-    last_connection: "",
-    created_by_user_id: "",
-    creation_date: "",
-    id: "",
-    icon: "",
-    enabled: "",
-    title: "",
-    manager_id: "",
-    job_title: "",
-    userName: "",
-    lastname: "",
+  let started_by: StartedBy = {
     firstname: "",
+    icon: "",
+    creation_date: "",
+    userName: "",
+    title: "",
+    created_by_user_id: "",
+    enabled: "",
+    lastname: "",
+    last_connection: "",
     password: "",
+    manager_id: "",
+    id: "",
+    job_title: "",
     last_update_date: "",
   };
-  let startedBy: StartedBy = {
-    last_connection: "",
-    created_by_user_id: "",
-    creation_date: "",
-    id: "",
-    icon: "",
-    enabled: "",
-    title: "",
-    manager_id: "",
-    job_title: "",
-    userName: "",
-    lastname: "",
+  let startedBySubstitute: StartedBySubstitute = {
     firstname: "",
+    icon: "",
+    creation_date: "",
+    userName: "",
+    title: "",
+    created_by_user_id: "",
+    enabled: "",
+    lastname: "",
+    last_connection: "",
     password: "",
+    manager_id: "",
+    id: "",
+    job_title: "",
     last_update_date: "",
   };
   let processDefinitionId: ProcessDefinitionId = {
-    id: "",
-    icon: "",
     displayDescription: "",
     deploymentDate: "",
-    description: "",
-    activationState: "",
-    name: "",
-    deployedBy: "",
     displayName: "",
-    actorinitiatorid: "",
-    last_update_date: "",
-    configurationState: "",
+    name: "",
+    description: "",
+    deployedBy: "",
+    id: "",
+    activationState: "",
     version: "",
+    configurationState: "",
+    last_update_date: "",
+    actorinitiatorid: "",
   };
-  let elcase: iListCaseForClient = {
+  let iarchivedCaseid: iArchivedCase = {
     end_date: "",
+    archivedDate: "",
     searchIndex5Label: "",
+    processDefinitionId: processDefinitionId,
     searchIndex3Value: "",
     searchIndex4Value: "",
     searchIndex2Label: "",
     start: "",
     searchIndex1Value: "",
+    sourceObjectId: "",
     searchIndex3Label: "",
+    startedBySubstitute: startedBySubstitute,
     searchIndex5Value: "",
     searchIndex2Value: "",
     rootCaseId: "",
     id: "",
     state: "",
     searchIndex1Label: "",
+    started_by: started_by,
     searchIndex4Label: "",
     last_update_date: "",
-    failedFlowNodes: "",
-    startedBySubstitute: startedBySubstitute,
-    activeFlowNodes: "",
-    started_by: startedBy,
-    processDefinitionId: processDefinitionId,
   };
 
-  const [caseid, setCaseid] = useState<listCaseForClient>(elcase);
+  const [isVisible, setisVisible] = useState(false);
+  const [inputId, setInputId] = useState<string>("1");
+
+  const [archivedCaseid, setArchivedCaseid] = useState<archivedCase>(
+    iarchivedCaseid
+  );
+  const LimpiarUseState = () => {
+    const [archivedCaseid, setArchivedCaseid] = useState<archivedCase>(
+      iarchivedCaseid
+    );
+  };
   useEffect(() => {
     if (!isVisible) {
       console.log("useLayoutEffect");
@@ -117,7 +108,7 @@ function ListaCasosActivos() {
 
   //#region caseForId
   const caseForId = async (id: string) => {
-    setCaseList([]);
+    //setArchivedCaseid();
     setisVisible(false);
     //setCaseid(caseid);
     console.log("el id", id);
@@ -127,10 +118,6 @@ function ListaCasosActivos() {
       console.log("no es mayor a cero");
       return;
     }
-
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
     axios.defaults.baseURL = "http://localhost:8080";
 
     axios.defaults.headers.post["Content-Type"] =
@@ -139,19 +126,27 @@ function ListaCasosActivos() {
     axios.defaults.withCredentials = true;
     axios
       .get(
-        "/bonita/API/bpm/case/" +
-          id +
-          "?d=processDefinitionId&d=started_by&d=startedBySubstitute"
+        "/bonita/API/bpm/archivedCase/?p=0&c=1&d=started_by&d=startedBySubstitute&d=processDefinitionId&f=sourceObjectId=" +
+          id
       )
       .then((resp) => {
         let result = resp;
-        setCaseid(result.data);
-        setisVisible(true);
+        console.log(result.data);
+        if (result.data.length > 0) {
+          setArchivedCaseid(result.data);
+          setisVisible(true);
+        } else {
+          //LimpiarUseState;
+          setisVisible(false);
+        }
+
         return;
       })
       .catch((error: any) => {
         console.log(error);
+        LimpiarUseState;
         setisVisible(false);
+
         return;
       });
     return;
@@ -164,7 +159,7 @@ function ListaCasosActivos() {
       {isVisible === false ? (
         <div className="">
           <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
-            <div className="p-2 bd-highlight">Id de caso</div>
+            <div className="p-2 bd-highlight">Id de caso archivado</div>
             <div className="p-2 bd-highlight">
               <input
                 type="text"
@@ -187,25 +182,27 @@ function ListaCasosActivos() {
         </div>
       ) : (
         <div>
-          <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
-            <div className="p-2 bd-highlight">Id de caso</div>
-            <div className="p-2 bd-highlight">
-              <input
-                type="text"
-                className=""
-                id="caseId"
-                placeholder="Numero de caso a buscar?"
-                onChange={(e) => setInputId(e.target.value)}
-              />
-            </div>
-            <div className="p-2 bd-highlight">
-              {" "}
-              <button
-                onClick={() => caseForId(inputId)}
-                className="btn btn-outline-info btn-sm align-text-bottom"
-              >
-                Buscar
-              </button>
+          <div className="">
+            <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
+              <div className="p-2 bd-highlight">Id de caso archivado</div>
+              <div className="p-2 bd-highlight">
+                <input
+                  type="text"
+                  className=""
+                  id="caseId"
+                  placeholder="Numero de caso a buscar?"
+                  onChange={(e) => setInputId(e.target.value)}
+                />
+              </div>
+              <div className="p-2 bd-highlight">
+                {" "}
+                <button
+                  onClick={() => caseForId(inputId)}
+                  className="btn btn-outline-info btn-sm align-text-bottom"
+                >
+                  Buscar
+                </button>
+              </div>
             </div>
           </div>
           <ul className="nav nav-tabs" role="tablist">
@@ -234,35 +231,37 @@ function ListaCasosActivos() {
                 <div className="column">
                   <div className="row"></div>
 
-                  <p>Caso abierto </p>
-
+                  <p>Caso Archivado </p>
                   <div className="container ">
                     <div className="row shadow p-2 mb-3 bg-white rounded">
                       <div className="row">
                         <div className="col">
                           {" "}
                           <div>id de caso</div>
-                          <div> {caseid.id} </div>
+                          <div> {archivedCaseid.sourceObjectId} </div>
                         </div>
                         <div className="col">
                           <div> Nombre proceso </div>
-                          <div>{caseid.processDefinitionId.displayName}</div>
+                          <div>
+                            {/*archivedCaseid.processDefinitionId.displayName*/}
+                          </div>
                         </div>
                         <div className="col">
                           <div>Iniciado por </div>
                           <div>
-                            {" "}
-                            {caseid.startedBySubstitute.firstname}{" "}
-                            {caseid.startedBySubstitute.lastname}{" "}
+                            {/*archivedCaseid.startedBySubstitute.firstname*/}
+                            {/*archivedCaseid.startedBySubstitute.lastname*/}
                           </div>
                         </div>
                         <div className="col">
                           <div>Fecha inicio</div>
-                          <div>{formatearFecha(caseid.start)}</div>
+                          <div>{formatearFecha(archivedCaseid.start)}</div>
                         </div>
                         <div className="col">
-                          <div>Tareas</div>
-                          <div>{caseid.id} </div>
+                          <div>Fecha fin</div>
+                          <div>
+                            {formatearFecha(archivedCaseid.archivedDate)}
+                          </div>
                         </div>
                         <div className="col-1">
                           {" "}
@@ -270,7 +269,7 @@ function ListaCasosActivos() {
                           <div>
                             {" "}
                             <button
-                              onClick={() => caseForId(caseid.id)}
+                              onClick={() => caseForId(archivedCaseid.id)}
                               className="btn btn-outline-info btn-sm align-text-bottom"
                             >
                               {" "}
@@ -291,4 +290,4 @@ function ListaCasosActivos() {
   );
 }
 
-export default ListaCasosActivos;
+export default CasoArchivadoId;

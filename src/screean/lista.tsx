@@ -13,6 +13,7 @@ import { iCase } from "../interfaces/case";
 import Modals from "./modal";
 import CaseById from "./caseById";
 import { formatearFecha } from "../components/formatoFecha";
+import Icons from "../components/icons";
 
 function Lista() {
   type listCaseForClient = iListCaseForClient;
@@ -49,7 +50,7 @@ function Lista() {
     axios.defaults.withCredentials = true;
     axios
       .get(
-        "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
+        "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0&o=startDate+DESC"
       )
       .then((resp) => {
         let result = resp;
@@ -71,7 +72,7 @@ function Lista() {
     axios.defaults.withCredentials = true;
     axios
       .get(
-        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&t=0"
+        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&t=0&o=startDate+DESC"
       )
       .then((resp) => {
         let result = resp;
@@ -123,7 +124,7 @@ function Lista() {
             role="tab"
             onClick={obtenerCaseList}
           >
-            Casos abiertos
+            Casos abiertos <Icons />
           </a>
         </li>
         <li className="nav-item" role="presentation">
@@ -136,7 +137,7 @@ function Lista() {
             onClick={obtenerArchivedActivity}
             tabIndex={-1}
           >
-            Casos archivados
+            Casos archivados <Icons />
           </a>
         </li>
       </ul>
@@ -206,7 +207,7 @@ function Lista() {
                   <div className="row shadow p-2 mb-3 bg-white rounded">
                     <div className="col-1">
                       <div>Id </div>
-                      <div>{list.id} </div>
+                      <div>{list.rootCaseId} </div>
                     </div>
                     <div className="col-1">
                       <div> Proceso </div>
