@@ -30,7 +30,7 @@ const Accordion = () => {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";

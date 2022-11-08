@@ -20,16 +20,14 @@ function App() {
   const [serviceLogin, setServiceLogin] = useState("");
 
   const axioslogin = async () => {
-    const endpoint =
-      "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
-
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios
       .get(
-        "/bonita/loginservice?username=walter.bates&password=bpm&redirect=true"
+        process.env.REACT_APP_API_LOGINSERVICE +
+          "?username=walter.bates&password=bpm&redirect=true"
       )
       .then((resp) => {
         //console.log("resp JSON.stringif = ", JSON.stringify(resp));
@@ -63,7 +61,7 @@ function App() {
       headers: { "Access-Control-Allow-Origin": "*" },
     };
     const rst = await axios(config)
-      .then(function(res) {
+      .then(function (res) {
         console.log(" await axios");
         console.log(JSON.stringify(res.data));
         const data_array = JSON.stringify(res.data).split(",");
@@ -75,7 +73,7 @@ function App() {
 
         cok.set("X-Bonita-API-Token", data_array[1].split(":")[1].split(","));
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       });
   };
@@ -84,7 +82,7 @@ function App() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -93,7 +91,7 @@ function App() {
 
     ////////////
     axios
-      .get("/bonita/API/bpm/case/4001")
+      .get(process.env.REACT_APP_GET_CASEFORID + "4001")
       .then((resp) => {
         let result = resp;
         //setestupido(resp.data);
@@ -109,7 +107,7 @@ function App() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -117,7 +115,7 @@ function App() {
     axios.defaults.withCredentials = true;
 
     axios
-      .get("/bonita/API/system/session/unusedId")
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         console.log(result);
@@ -131,7 +129,7 @@ function App() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";

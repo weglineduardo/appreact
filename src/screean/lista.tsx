@@ -1,21 +1,30 @@
-//import "./App.css";
-import Axios from "axios";
-import React, { useState, useEffect } from "react";
-import { JsonSerializer, throwError } from "typescript-json-serializer";
-import { JsonObject, JsonProperty } from "json2typescript";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useLayoutEffect } from "react";
+("json2typescript");
 import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
-import { kMaxLength } from "buffer";
-import { ClasesApi } from "../clases/clasesApi";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
 import { iCase } from "../interfaces/case";
 import Modals from "./modal";
-import CaseById from "./caseById";
 import { formatearFecha } from "../components/formatoFecha";
 import Icons from "../components/icons";
+import AlertDanger from "./alertDanger";
+import { iUsuario } from "../interfaces/usuario";
 
 function Lista() {
+  let iUarioActivo: iUsuario = {
+    copyright: "",
+    is_guest_user: "",
+    branding_version: "",
+    branding_version_with_date: "",
+    user_id: "",
+    user_name: "",
+    session_id: "",
+    conf: "",
+    is_technical_user: "",
+    version: "",
+  };
+
   type listCaseForClient = iListCaseForClient;
   //usamos listCaseForClient para setArchivedCaseList y
   //tambien para setCaseList por que son los mismo atributos
@@ -25,24 +34,28 @@ function Lista() {
   const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
   type caseId = iCase;
   const [caseid, setCaseid] = useState<caseId[]>([]);
-  let defaultSerializer = new JsonSerializer();
-  let jsonConvert: JsonConvert = new JsonConvert();
-  const [comments, setComments] = useState([undefined]);
+  const [show, setShow] = useState(false);
+  const [usuario, setUsuario] = useState<iUsuario>(iUarioActivo);
+  const [serviceLogin, setServiceLogin] = useState("");
+  //useEffect(() => {
+  //  //obtenerCaseList("4");
+  //  //caseForId;
+  //  // fetchComments();
+  //}, [caseList, caseid]);
+  const navigate = useNavigate();
 
-  const [jcomments, setjComments] = useState([undefined]);
-  useEffect(() => {
-    obtenerCaseList;
-    caseForId;
-    // fetchComments();
-  }, [caseList, caseid]);
-  useEffect(() => {
-    //console.log(comments);
-  }, [comments]);
-  const obtenerCaseList = async () => {
+  const navigateTo = (routeUrl: string) => {
+    const url = `/caso-detalle/?id=${routeUrl}`;
+    navigate(url);
+  };
+  const obtenerCaseList = async (user_id: string) => {
+    //await usuarioActivo();
+    let userId = usuario.user_id;
     const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    console.log("usuario", usuario);
+    console.log("serviceLogin", serviceLogin);
+
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -50,36 +63,92 @@ function Lista() {
     axios.defaults.withCredentials = true;
     axios
       .get(
-        "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0&o=startDate+DESC"
+        "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=20&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=" +
+          userId +
+          "&n=activeFlowNodes&n=failedFlowNodes&t=0&o=startDate+DESC"
       )
       .then((resp) => {
         let result = resp;
         setCaseList(result.data);
         console.log(result.data);
+        if (result.data.length == 0) {
+          console.log("lista vacia");
+          setShow(true);
+        } else {
+          setShow(false);
+        }
       })
       .catch((error: any) => {
+        setShow(true);
+        console.log(error);
+      });
+    return;
+  };
+  //#region usuario activo
+  const usuarioActivo = async () => {
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    axios
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
+      .then((resp) => {
+        let result = resp;
+        setUsuario(result.data);
+        ////let rr = jsonConvert.deserializeObject(result.data, rs);
+        console.log(
+          "usuario.user_id"
+          //usuario ? usuario.user_id : "sin usuario.user_id"
+        );
+        setServiceLogin(
+          "Login Success "
+          //+ (usuario ? usuario.user_name : "sin datos")
+        );
+
+        console.log(result.data);
+      })
+      .catch((error) => {
         console.log(error);
       });
     return;
   };
 
+  useEffect(() => {
+    usuarioActivo();
+  }, []);
+  //useLayoutEffect(() => {
+  //  usuarioActivo();
+  //}, []);
+
+  //#endregion
   //#region obtenerArchivedActivity
   const obtenerArchivedActivity = async () => {
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
       .get(
-        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&t=0&o=startDate+DESC"
+        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=" +
+          usuario.user_id +
+          "&t=0&o=startDate+DESC"
       )
       .then((resp) => {
         let result = resp;
         setArchivedCaseList(result.data);
         console.log("setArchivedCaseList", result.data);
+        if (result.data.length == 0) {
+          console.log("lista vacia");
+          setShow(true);
+        } else {
+          setShow(false);
+        }
       })
       .catch((error: any) => {
+        setShow(true);
         console.log(error);
       });
     return;
@@ -90,19 +159,24 @@ function Lista() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
-      .get("/bonita/API/bpm/case/" + id)
+      .get(process.env.REACT_APP_GET_CASEFORID + id)
       .then((resp) => {
         let result = resp;
         setCaseid(result.data);
         console.log("setCaseId", caseid);
-
+        if (result.data.length == 0) {
+          console.log("lista vacia");
+          setShow(true);
+        } else {
+          setShow(false);
+        }
         setCaseid(result.data);
       })
       .catch((error: any) => {
@@ -111,6 +185,24 @@ function Lista() {
     return;
   };
   //#endregion
+
+  //#region alert
+  const showAlert = (msjAlert: string, msj: string) => {
+    if (show) {
+      return <AlertDanger msj={msjAlert} />;
+    } else {
+      return <p>{msj}</p>;
+    }
+
+    /*{
+      return (
+        show && (
+          <AlertDanger msj={"NO encontramos casos para el cliente logueado"} />
+        )
+      );
+    }*/
+  };
+  //endregion
 
   return (
     <>
@@ -122,7 +214,7 @@ function Lista() {
             href="#home"
             aria-selected="true"
             role="tab"
-            onClick={obtenerCaseList}
+            onClick={() => obtenerCaseList(usuario.user_id)}
           >
             Casos abiertos <Icons />
           </a>
@@ -148,20 +240,22 @@ function Lista() {
             <div className="column"></div>
             <div className="column">
               <div className="row"></div>
-
-              <p>Estos son casos abiertos</p>
+              {showAlert(
+                "NO encontramos casos para el cliente logueado",
+                "Estos son los casos abiertos"
+              )}
               {caseList.map((list) => (
-                <div className="container ">
+                <div className="container">
                   <div className="row shadow p-2 mb-3 bg-white rounded">
-                    <div className="col">
+                    <div className="col-1">
                       <div>Id </div>
-                      <div>{list.id} </div>
+                      <div>{list.rootCaseId} </div>
                     </div>
-                    <div className="col">
-                      <div> Nombre proceso </div>
+                    <div className="col-1">
+                      <div> Proceso </div>
                       <div>{list.processDefinitionId.displayName} </div>
                     </div>
-                    <div className="col">
+                    <div className="col-3">
                       <div>Iniciado por </div>
                       <div>
                         {" "}
@@ -169,20 +263,22 @@ function Lista() {
                         {list.startedBySubstitute.lastname}{" "}
                       </div>
                     </div>
-                    <div className="col">
+                    <div className="col-3">
                       {" "}
                       <div>Fecha inicio</div>
                       <div>{formatearFecha(list.start)} </div>
                     </div>
-                    <div className="col">
+                    <div className="col-3">
                       <div>Tareas</div>
-                      <div>{list.id} </div>
+                      <div>cant tareas</div>
                     </div>
-                    <div className="col">
+                    <div className="col-1">
                       <div>
-                        {" "}
+                        {/*<div>
+            <Modals id={"vemos o no el modal "} isShow={true} />{" "}
+          </div>*/}
                         <button
-                          onClick={() => caseForId(list.id)}
+                          onClick={() => navigateTo(list.id)}
                           className="btn btn-outline-info btn-sm align-text-bottom"
                         >
                           {" "}
@@ -200,7 +296,10 @@ function Lista() {
           <div className="row">
             <div className="column"></div>
             <div className="column">
-              <p>Estos son casos archivados</p>
+              {showAlert(
+                "NO encontramos casos para el cliente logueado",
+                "Estos son los casos archivados"
+              )}
 
               {archivedCaseList.map((list) => (
                 <div className="container">
@@ -232,7 +331,6 @@ function Lista() {
                     </div>
                     <div className="col-1">
                       <div>
-                        <Modals id={list.id} />{" "}
                         <button
                           onClick={() => caseForId(list.id)}
                           className="btn btn-outline-info btn-sm align-text-bottom"

@@ -10,17 +10,23 @@ import Modal from "react-bootstrap/Modal";
 }*/
 interface Props {
   id: string;
+  isShow: boolean;
 }
-const Modals: React.FC<Props> = ({ id }) => {
+const Modals: React.FC<Props> = ({ id, isShow }) => {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleShow = () => setShow(isShow);
+  const showModal = (view: boolean) => {
+    setShow(view);
+  };
+
+  handleShow();
 
   return (
     <>
       <button className="btn btn-primary" onClick={handleShow}>
-        ver
+        ver aca la modal es llamada
       </button>
 
       <Modal

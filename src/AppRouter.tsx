@@ -9,27 +9,45 @@ import App from "./App";
 import Login from "./components/login";
 import CaseById from "./screean/caseById";
 import CaseArchivedById from "./screean/caseArchivedById";
-import casoActivoPorNombreProceso from "./screean/casoActivoPorNombreProceso";
-import CasoActivoPorNombreProceso from "./screean/casoActivoPorNombreProceso";
 import CaseByNameProcess from "./screean/caseByNameProcess";
 import CaseArchivedByNameProcess from "./screean/caseArchivedByNameProcess";
 import Home from "./screean/home";
+import TestRouter from "./components/testRouter";
+import ErrorPage from "./components/error-page";
 
 function AppRouter() {
+  //const isAuth = useAuth();
+
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="home" element={<Home />} />
-        <Route path="app" element={<App />} />
-        <Route path="navbar" element={<NavBar />} />
-        <Route path="casebyid" element={<CaseById />} />
-        <Route path="caseByNameProcess" element={<CaseByNameProcess />} />
-        <Route path="casearchivedbyid" element={<CaseArchivedById />} />
-        <Route path="casearchivedbyid" element={<CaseArchivedById />} />
+        <Route path="/" element={<Login />} errorElement={<ErrorPage />} />
+        <Route
+          path="/testrouter"
+          element={<TestRouter />}
+          errorElement={<ErrorPage />}
+        />
+        <Route path="home" element={<Home />} errorElement={<ErrorPage />} />
+        <Route path="app" element={<App />} errorElement={<ErrorPage />} />
+        <Route
+          path="casebyid"
+          element={<CaseById />}
+          errorElement={<ErrorPage />}
+        />
+        <Route
+          path="caseByNameProcess"
+          element={<CaseByNameProcess />}
+          errorElement={<ErrorPage />}
+        />
+        <Route
+          path="casearchivedbyid"
+          element={<CaseArchivedById />}
+          errorElement={<ErrorPage />}
+        />
         <Route
           path="caseArchivedByNameProcess"
           element={<CaseArchivedByNameProcess />}
+          errorElement={<ErrorPage />}
         />
       </Routes>
     </div>

@@ -116,7 +116,7 @@ function casoActivoPorNombreProceso() {
   const obtenerCaseList = async (name: string) => {
     setCaseList([]);
     setisVisible(false);
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";

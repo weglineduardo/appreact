@@ -75,7 +75,9 @@ function NavBarMaster() {
       RequestInit.method = "POST";
 
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/loginservice";
+        process.env.REACT_APP_BASE_URL_API +
+        "" +
+        process.env.REACT_APP_API_LOGINSERVICE;
 
       await fetch(BASE_URL, RequestInit)
         .then((result) => {
@@ -104,10 +106,7 @@ function NavBarMaster() {
     axiosLogOut();
   };
   const axiosLogOut = async () => {
-    const endpoint =
-      "http://localhost:8080/bonita/logoutservice?redirect=false";
-
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
@@ -131,14 +130,14 @@ function NavBarMaster() {
 
   //#region usuario activo
   const usuarioActivo = async () => {
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
-      .get("/bonita/API/system/session/unusedId")
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
@@ -180,7 +179,7 @@ function NavBarMaster() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -188,7 +187,7 @@ function NavBarMaster() {
     axios.defaults.withCredentials = true;
 
     axios
-      .get("/bonita/API/bpm/case/4001")
+      .get(process.env.REACT_APP_GET_CASEFORID + "4001")
       .then((resp) => {
         let result = resp;
         console.log(result);
@@ -209,7 +208,7 @@ function NavBarMaster() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";

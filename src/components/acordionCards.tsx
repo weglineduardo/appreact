@@ -1,7 +1,8 @@
 import React from "react";
+import ChildAcodionCard from "./childAcodionCard";
 import ChildCard from "./childCard";
 
-function Cards() {
+function AcordionCards() {
   return (
     <div>
       <div className="container ">
@@ -12,14 +13,14 @@ function Cards() {
               <div></div>
               <div>
                 {" "}
-                <ChildCard
+                <ChildAcodionCard
                   idAcordion={"Incidente"}
                   titleAcordion={"Incidentes"}
                   cardHeader={"Incidente"}
                   cardTitle={"Informar incidente."}
                   body={"Un indicente es ......"}
                   textButton={"Iniciar un nuevo incidente"}
-                  routeUrl="routeUrl"
+                  routeUrl="nuevo-incidente"
                   style={"danger"}
                 />
               </div>
@@ -28,14 +29,14 @@ function Cards() {
               <div></div>
               <div>
                 {" "}
-                <ChildCard
+                <ChildAcodionCard
                   idAcordion={"Requerimiento"}
                   titleAcordion={"Requerimientos"}
                   cardHeader={"Requerimiento"}
                   cardTitle={"Informar requerimiento"}
                   body={"Un requerimiento es bla bla"}
                   textButton={"Iniciar un nuevo requerimiento"}
-                  routeUrl="routeUrl"
+                  routeUrl="nuevo-service-request"
                   style={"info"}
                 />
               </div>
@@ -44,7 +45,7 @@ function Cards() {
               <div></div>
               <div>
                 {" "}
-                <ChildCard
+                <ChildAcodionCard
                   idAcordion={"Consultoria"}
                   titleAcordion={"Consultorias"}
                   cardHeader={"Consultoria"}
@@ -57,7 +58,7 @@ function Cards() {
               </div>
             </div>
             <div className="col">
-              <ChildCard
+              <ChildAcodionCard
                 idAcordion={"Ticket"}
                 titleAcordion={"Tickets"}
                 cardHeader={"Ticket"}
@@ -69,7 +70,7 @@ function Cards() {
               />
             </div>
             <div className="col">
-              <ChildCard
+              <ChildAcodionCard
                 idAcordion={"Ayuda"}
                 titleAcordion={"Asistencia telefonica ayuda"}
                 cardHeader={"Ayuda"}
@@ -87,4 +88,4 @@ function Cards() {
   );
 }
 
-export default Cards;
+export default AcordionCards;

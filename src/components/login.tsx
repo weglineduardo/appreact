@@ -1,30 +1,20 @@
-import { Link, redirect } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import Cookies from "universal-cookie";
-import { Cookies as kks } from "react-cookie";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import axios, { AxiosResponse } from "axios";
-import fetchBonitaLogin from "../components/fetchBonitaLogin";
-import fetchCase from "../components/fetchCase";
-import unusedIdFetch from "../components/unusedIdFetch";
 
 import { useNavigate } from "react-router-dom";
 import { iUsuario } from "../interfaces/usuario";
-import bonitaCase from "../components/bonitaCase";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 
-import { idText } from "typescript";
-import { JsonSerializer } from "typescript-json-serializer";
 import { JsonConvert, ValueCheckingMode } from "json2typescript";
-import ButtonComponent from "./nave";
-import LoginFc from "./loginfc";
-function Login() {
-  //#region tipos y clases
+import { UsuarioContext } from "../context/usuarioContext";
+import AlertDanger from "../screean/alertDanger";
 
-  const mapDiv = useRef("--");
+function Login() {
+  const { user_id } = useContext(UsuarioContext);
   const [inputUsuario, setInputUsuario] = useState("");
-  const [inputPass, setInputpPass] = useState("");
-  const count = useRef(45);
+  const [inputPass, setInputPass] = useState("");
+  const [show, setShow] = useState(false);
 
   let title = React.createRef();
   let refUsuario = useRef(null);
@@ -41,10 +31,11 @@ function Login() {
     "is_technical_user": string;
     "version": string;
   }
+
+  const [bredirect, setBredirect] = useState(false);
+  const [isLogin, setLogin] = useState(false);
   const [serviceLogin, setServiceLogin] = useState("");
   const [usuario, setUsuario] = useState<iUarioActivo>();
-  const [caseList, setCaseList] = useState([]);
-  let defaultSerializer = new JsonSerializer();
   let jsonConvert: JsonConvert = new JsonConvert();
   //#region
 
@@ -57,27 +48,24 @@ function Login() {
 
     console.log(visibilidad);
   };
+
   const fetchLoginService = () => {
-    loginFetch(inputUsuario, inputPass);
-    usuarioActivo;
-    handleClick();
-    //console.log(serviceLogin);
+    //console.log(inputUsuario, inputPass);
+    loginFetch(inputUsuario, inputPass).then(() => setBredirect(true));
+    usuarioActivo();
+    setBredirect(false);
 
-    /*usuario?.branding_version &&
-      console.log("is_guest_user", usuario?.branding_version);
-    const is_guest_user = (usuario?.branding_version, "que onda");
-    console.log("is_guest_user", is_guest_user);*/
+    if (!bredirect) {
+      return navigateTo("home");
+    }
   };
 
-  const handleClick = () => {
-    console.log("/app");
-    const navigate = useNavigate();
-    navigate("/app");
-  };
   const loginFetch = async (username: string, password: string) => {
     loginFechToBonita(username, password);
 
     async function loginFechToBonita(username: string, password: string) {
+      const BASE_URL = process.env.REACT_APP_BASE_URL_API;
+      let urlapi = process.env.REACT_APP_API_LOGINSERVICE;
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -95,72 +83,89 @@ function Login() {
       };
       RequestInit.method = "POST";
 
-      const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/loginservice";
-
-      await fetch(BASE_URL, RequestInit)
+      await fetch(BASE_URL + "" + urlapi, RequestInit)
         .then((result) => {
           if (!result.ok) {
+            window.localStorage.removeItem("setServiceLogin");
+            window.localStorage.removeItem("usuario");
             setServiceLogin("Error de Login");
-            throw Error(result.status.toString());
+            setShow(true);
+            return;
           }
-          /*result.json().then((json) => {
-            console.log("result.body jsom = ", json);
-          });*/
-          setServiceLogin("Login Success");
-          console.log(result);
 
-          console.log("serviceLogin", serviceLogin);
-          return result;
+          const thebody = JSON.stringify(result.body);
+          window.localStorage.setItem("setServiceLogin", thebody);
+          setServiceLogin("Login Success " + username);
+          setShow(false);
+          return;
         })
         .catch((error) => {
-          console.log("error fetch", error);
-          return error;
+          window.localStorage.removeItem("setServiceLogin");
+          window.localStorage.removeItem("usuario");
+          console.log("error fetch ------", error);
+          setShow(true);
+          return;
         });
     }
   };
   //#endregion
   //#region usuario activo
   const usuarioActivo = async () => {
-    axios.defaults.baseURL = "http://localhost:8080";
+    class usuarioActivo {
+      "copyright": string;
+      "is_guest_user": string;
+      "branding_version": string;
+      "branding_version_with_date": string;
+      "user_id": string;
+      "user_name": string;
+      "session_id": string;
+      "conf": string;
+      "is_technical_user": string;
+      "version": string;
+    }
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
+
     await axios
-      .get("/bonita/API/system/session/unusedId")
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
 
         let rr = jsonConvert.deserializeObject(result.data, rs);
-        console.log("rr", usuario ? usuario.branding_version : "sin datos");
+        //console.log("rr", usuario ? usuario.branding_version : "sin datos");
         console.log(result.data);
+        window.localStorage.setItem("usuario", JSON.stringify(result.data));
+        window.localStorage.setItem("rr", JSON.stringify(rr));
+        let storrageUser = JSON.stringify(
+          window.localStorage.getItem("usuario")
+        );
       })
       .catch((error) => {
+        //window.localStorage.removeItem("usuario");
         console.log(error);
       });
     return;
   };
   //#endregion
-  const naver = () => {
-    const navigate = useNavigate();
-
-    const handleClick = () => {
-      navigate("/app");
-    };
-
-    return (
-      <div>
-        <button onClick={handleClick} type="button">
-          {" "}
-          acaa es{" "}
-        </button>
-        <button onClick={handleClick} type="button" />
-      </div>
-    );
+  const showAlert = (msjAlert: string, msj: string) => {
+    if (show) {
+      return <AlertDanger msj={msjAlert} />;
+    } else {
+      return <p>{msj}</p>;
+    }
   };
+  const navigate = useNavigate();
+
+  const navigateTo = (routeUrl: string) => {
+    const url = `/${routeUrl}`;
+    navigate(url);
+  };
+
   return (
     <>
       <div className="position-absolute top-50 start-50 translate-middle ">
@@ -171,6 +176,7 @@ function Login() {
             {" "}
             <div className=" shadow p-2 mb-3 bg-secundary ">
               <div className="card text-white bg-primary mb-3">
+                {showAlert("NO hemos logrado identificarte", "")}
                 <div className="card-header">Portal </div>
                 <div className="card-body">
                   <h4 className="card-title">Login</h4>
@@ -183,8 +189,8 @@ function Login() {
                             type="text"
                             className="form-control"
                             id="usuario"
-                            aria-describedby="emailHelp"
                             placeholder="Usuario"
+                            autoComplete="off"
                             onChange={(e) => setInputUsuario(e.target.value)}
                           />
                         </div>
@@ -195,15 +201,27 @@ function Login() {
                             type="password"
                             className="form-control"
                             id="password"
+                            autoComplete="off"
                             placeholder="Contraseña"
-                            onChange={(e) => setInputpPass(e.target.value)}
+                            onChange={(e) => setInputPass(e.target.value)}
                           />
                         </div>
 
                         <div className="form-group ">
                           <h4 className="card-title"></h4>
-                          <ButtonComponent />
-                          {/*{visibilidad ? <ButtonComponent /> : null}
+                          <button
+                            className="btn btn-succes"
+                            onClick={fetchLoginService}
+                          >
+                            Ingresar
+                          </button>
+
+                          {/*<button
+                            className="btn btn-succes"
+                            onClick={fetchLoginService}
+                          >
+                            fetchLoginService
+                          </button>{visibilidad ? <ButtonComponent /> : null}
 
                           <button
                             className="btn btn-succes"

@@ -30,7 +30,7 @@ function AppStyle() {
           Primary
         </button>
         <div className="container-fluid col-6" id="aler">
-          <AlertDanger />
+          <AlertDanger msj={""} />
         </div>
         <DataBsTarget />
       </header>

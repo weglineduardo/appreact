@@ -1,12 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-//import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
-import Lista from "./screean/lista";
 
 import { BrowserRouter } from "react-router-dom";
-import AppRouter from "./AppRouter";
+import AppRouterV1 from "./AppRouterV1";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -14,7 +10,8 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <BrowserRouter>
-    <AppRouter />
+    {/*<AppRouter />*/}
+    <AppRouterV1 />
   </BrowserRouter>
   /*<React.StrictMode>
     <App />

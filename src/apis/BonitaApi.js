@@ -8,9 +8,8 @@ class BonitaApi {
       // const [serviceLogin, setServiceLogin] = useState("");
       const endpoint =
         process.env.REACT_APP_BASE_URL_API +
-        "" +
-        process.env.REACT_APP_API_LOGINSERVICE +
-        "?username=walter.bates&password=bpm&redirect=false";
+        process.env.REACT_APP_API_LOGINSERVICE;
+      ("?username=walter.bates&password=bpm&redirect=false");
       const intance = axios.create({
         baseURL: endpoint,
         headers: {
@@ -304,7 +303,6 @@ class BonitaApi {
       };
       const BASE_URL =
         process.env.REACT_APP_BASE_URL_API +
-        "" +
         process.env.REACT_APP_API_USERACTIVE;
 
       return await fetch(BASE_URL, requestOptions)
@@ -357,9 +355,78 @@ class BonitaApi {
         credentials: "include",
       };
       const BASE_URL =
+        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/4001";
+
+      return await fetch(BASE_URL, requestOptions)
+        .then((result) => {
+          if (!result.ok) {
+            console.log(result.status, result.statusText);
+            throw Error(result.status);
+          }
+          console.log(
+            "result.status fetch",
+            result.status + " " + result.statusText
+          );
+
+          console.log(
+            "result.headers fetch",
+            result.headers.get("X-Bonita-API-Token")
+          );
+          result.json().then((json) => {
+            console.log("result.body jsom = ", json);
+          });
+          return result;
+        })
+        .catch((error) => {
+          console.log("error fetch", error);
+          return error;
+        });
+    }
+  }
+
+  async createCase() {
+    createCaseBonita();
+
+    async function createCaseBonita() {
+      const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
+      const myHeaders = new Headers();
+
+      myHeaders.append(
+        "X-Bonita-API-Token",
+        "cacd21d9-56bc-4890-a8e4-e63e43360087"
+      );
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append(
+        "Cookie",
+        "bonita.tenant=1; BOS_Locale=es; Cookie_1=value; JSESSIONID=315C016B8F6C765335240F11C679C194; X-Bonita-API-Token=cacd21d9-56bc-4890-a8e4-e63e43360087"
+      );
+      /* myHeaders.append(
+        "Content-type",
+        "application/json",
+        "X-Bonita-API-Token",
+        { X_Bonita_API_Token },
+        "Cookie",
+        `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=${X_Bonita_API_Token}`
+      );*/
+      let raw = JSON.stringify({
+        serviceRequestInput: {
+          alarma: "esta es la alarma 2222",
+          descripcion: "22222 descripcion alarma",
+          prioridad: "Alta",
+          estado: "",
+        },
+      });
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("method", "POST");
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const BASE_URL =
         process.env.REACT_APP_BASE_URL_API +
-        process.env.REACT_APP_BASE_URL_API +
-        "4001";
+        "/bonita/API/bpm/process/7187029084818193889/instantiation";
 
       return await fetch(BASE_URL, requestOptions)
         .then((result) => {

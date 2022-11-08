@@ -87,7 +87,9 @@ const ButtonComponent = () => {
       RequestInit.method = "POST";
 
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/loginservice";
+        process.env.REACT_APP_BASE_URL_API +
+        "" +
+        process.env.REACT_APP_API_LOGINSERVICE;
 
       await fetch(BASE_URL, RequestInit)
         .then((result) => {
@@ -112,14 +114,14 @@ const ButtonComponent = () => {
   //#endregion
   //#region usuario activo
   const usuarioActivo = async () => {
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
-      .get("/bonita/API/system/session/unusedId")
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);

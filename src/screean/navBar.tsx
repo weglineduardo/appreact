@@ -1,15 +1,10 @@
 import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
-import fetchCase from "../components/fetchCase";
-import unusedIdFetch from "../components/unusedIdFetch";
 import React, { useState, useEffect } from "react";
 
 import { iUsuario } from "../interfaces/usuario";
-import bonitaCase from "../components/bonitaCase";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
-import Accordion from "./acordion";
-import { idText } from "typescript";
 import { JsonSerializer } from "typescript-json-serializer";
 import { JsonConvert } from "json2typescript";
 
@@ -39,16 +34,13 @@ function NavBar() {
   useEffect(() => {
     //console.log(caseList.forEach((c) => console.log(c)));
   }, [caseList]);
-
+  useEffect(() => {
+    usuarioActivo;
+  }, [serviceLogin, usuario]);
   //#region Login
   const fetchLoginService = async () => {
     loginFetch("walter.bates", "bpm");
     usuarioActivo();
-
-    /*usuario?.branding_version &&
-      console.log("is_guest_user", usuario?.branding_version);
-    const is_guest_user = (usuario?.branding_version, "que onda");
-    console.log("is_guest_user", is_guest_user);*/
   };
 
   const loginFetch = async (username: string, password: string) => {
@@ -75,7 +67,9 @@ function NavBar() {
       RequestInit.method = "POST";
 
       const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/loginservice";
+        process.env.REACT_APP_BASE_URL_API +
+        "" +
+        process.env.REACT_APP_API_LOGINSERVICE;
 
       await fetch(BASE_URL, RequestInit)
         .then((result) => {
@@ -107,7 +101,7 @@ function NavBar() {
     const endpoint =
       "http://localhost:8080/bonita/logoutservice?redirect=false";
 
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
@@ -115,13 +109,16 @@ function NavBar() {
     axios
       .get("/bonita/logoutservice?redirect=false")
       .then((resp) => {
-        //console.log("resp JSON.stringif = ", JSON.stringify(resp));
-        let result = resp; //resp.data;
+        window.localStorage.removeItem("setServiceLogin");
+        window.localStorage.removeItem("usuario");
+        window.localStorage.clear();
         setServiceLogin("");
         setUsuario(undefined);
-        console.log(result);
+        console.log(resp);
       })
       .catch((error) => {
+        window.localStorage.removeItem("setServiceLogin");
+        window.localStorage.removeItem("usuario");
         setServiceLogin(error);
         console.log(error);
       });
@@ -131,37 +128,25 @@ function NavBar() {
 
   //#region usuario activo
   const usuarioActivo = async () => {
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
-      .get("/bonita/API/system/session/unusedId")
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
-
         let rr = jsonConvert.deserializeObject(result.data, rs);
-        console.log("rr", usuario ? usuario.branding_version : "sin datos");
-        /*const rr: iUsuario = result.data;
-        const dataz = defaultSerializer.serialize(result.data);
-        console.log("dataz", dataz);
-        const name = defaultSerializer.deserializeObject<iUarioActivo>(
-          result.data,
-          rr
-        );
         console.log(
-          "name",
-          name?.session_id,
-          name?.session_id,
-          "name?.session_id"
-        );*/
-        /*let resultdata = jsonConvert.deserializeObject<iUsuario>(result.data);
-        let leusuario = jsonConvert.deserializeObject<iUsuario>(usuario);
-
-        console.log(resultdata.branding_version_with_date, "stringify");*/
+          "usuario.user_id",
+          usuario ? usuario.user_id : "sin usuario.user_id"
+        );
+        setServiceLogin(
+          "Login Success " + (usuario ? usuario.user_name : "sin datos")
+        );
 
         console.log(result.data);
       })
@@ -180,7 +165,7 @@ function NavBar() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -188,7 +173,7 @@ function NavBar() {
     axios.defaults.withCredentials = true;
 
     axios
-      .get("/bonita/API/bpm/case/4001")
+      .get(process.env.REACT_APP_GET_CASEFORID + "4001")
       .then((resp) => {
         let result = resp;
         console.log(result);
@@ -209,7 +194,7 @@ function NavBar() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -299,31 +284,6 @@ function NavBar() {
                   <span className="visually-hidden">(current)</span>
                 </a>
               </li>
-              <li className="nav-item" onClick={getCaseList}>
-                <a className="nav-link" href="#">
-                  Lista Casos
-                </a>
-              </li>
-              <li className="nav-item" onClick={getCase}>
-                <a className="nav-link" href="#">
-                  Caso
-                </a>
-              </li>
-              <li className="nav-item" onClick={loginOut}>
-                <a className="nav-link" href="#">
-                  LogOut
-                </a>
-              </li>
-              <li className="nav-item" onClick={usuarioActivo}>
-                <a className="nav-link" href="#">
-                  Usuario activo
-                </a>
-              </li>
-              <li className="nav-item" onClick={fetchLoginService}>
-                <a className="nav-link" href="#">
-                  Login
-                </a>
-              </li>
               <li className="nav-item dropdown">
                 <a
                   className="nav-link dropdown-toggle"
@@ -362,14 +322,14 @@ function NavBar() {
                           </a>
                           <ul className="dropdown-menu">
                             <li>
-                              <a className="dropdown-item" href="casebyid">
+                              <a className="dropdown-item" href="/casebyid">
                                 Por id
                               </a>
                             </li>
                             <li>
                               <a
                                 className="dropdown-item"
-                                href="caseByNameProcess"
+                                href="/caseByNameProcess"
                               >
                                 Por proceso
                               </a>
@@ -384,7 +344,7 @@ function NavBar() {
                             <li>
                               <a
                                 className="dropdown-item"
-                                href="casearchivedbyid"
+                                href="/casearchivedbyid"
                               >
                                 Por id
                               </a>
@@ -392,7 +352,7 @@ function NavBar() {
                             <li>
                               <a
                                 className="dropdown-item"
-                                href="caseArchivedByNameProcess"
+                                href="/caseArchivedByNameProcess"
                               >
                                 Por Proceso
                               </a>
@@ -409,6 +369,33 @@ function NavBar() {
                   </a>
                 </div>
               </li>
+              <li className="nav-item" onClick={usuarioActivo}>
+                <a className="nav-link" href="#">
+                  Usuario activo
+                </a>
+              </li>
+              <li className="nav-item" onClick={fetchLoginService}>
+                <a className="nav-link" href="#">
+                  Login
+                </a>
+              </li>
+              {/*
+              <li className="nav-item" onClick={getCaseList}>
+                <a className="nav-link" href="#">
+                  Lista Casos
+                </a>
+              </li>
+              <li className="nav-item" onClick={getCase}>
+                <a className="nav-link" href="#">
+                  Caso
+                </a>
+              </li>*/}
+              <li className="nav-item" onClick={loginOut}>
+                <a className="nav-link" href="/">
+                  LogOut
+                </a>
+              </li>
+
               <h6 className="text-succes">
                 {serviceLogin}
                 {/* {JSON.stringify(usuario ? usuario.user_name : " ")}*/}
@@ -441,7 +428,7 @@ export default NavBar;
     const endpoint =
       "http://localhost:8080/bonita/logoutservice?redirect=false";
 
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
@@ -463,7 +450,7 @@ export default NavBar;
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -489,7 +476,7 @@ export default NavBar;
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -516,7 +503,7 @@ export default NavBar;
     const endpoint =
       "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
 
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";

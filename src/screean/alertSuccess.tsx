@@ -6,7 +6,7 @@ import "bootswatch/dist/js/bootstrap";
 interface Props {
   msj: string;
 }
-const AlertDanger: React.FC<Props> = ({ msj }) => {
+const AlertSuccess: React.FC<Props> = ({ msj }) => {
   const [show, setShow] = useState(false);
 
   // const handleClose = () => setShow(false);
@@ -14,7 +14,7 @@ const AlertDanger: React.FC<Props> = ({ msj }) => {
 
   return (
     <>
-      <div className="alert alert-dismissible alert-primary">
+      <div className="alert alert-dismissible alert-success">
         {/*<button
         type="button"
         className="btn-close"
@@ -29,4 +29,4 @@ const AlertDanger: React.FC<Props> = ({ msj }) => {
     </>
   );
 };
-export default AlertDanger;
+export default AlertSuccess;

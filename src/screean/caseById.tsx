@@ -10,6 +10,7 @@ import Modals from "./modal";
 import NavBar from "./navBar";
 import Accordion from "./acordion";
 import ListaCasosActivos from "./casoActivoId";
+import ChildFormCasoDetalle from "../components/childFormCasoDetalle";
 
 function CaseById() {
   type listCaseForClient = iListCaseForClient;
@@ -37,14 +38,14 @@ function CaseById() {
     const cookies = new Cookies();
     let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
     let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = "http://localhost:8080";
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios
-      .get("/bonita/API/bpm/case/" + id)
+      .get(process.env.REACT_APP_GET_CASEFORID + id)
       .then((resp) => {
         let result = resp;
         setCaseid(result.data);
@@ -62,8 +63,7 @@ function CaseById() {
   return (
     <>
       <NavBar />
-
-      <ListaCasosActivos />
+      <ListaCasosActivos />\
     </>
   );
 }
