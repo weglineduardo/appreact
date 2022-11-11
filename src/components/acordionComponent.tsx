@@ -1,8 +1,10 @@
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
-import React from "react";
-import Lista from "./lista";
-const Accordion = () => {
+import React, { useState, useEffect } from "react";
+import Lista from "../screean/lista";
+
+//JSXElement: JSX.Element,
+const AccordionComponent = (): JSX.Element => {
   return (
     <>
       <div className="col-12 row">
@@ -17,7 +19,7 @@ const Accordion = () => {
                 aria-expanded="false"
                 aria-controls="collapseOne"
               >
-                Lista de casos
+                {"title"}
               </button>
             </h2>
             <div
@@ -26,9 +28,7 @@ const Accordion = () => {
               aria-labelledby="headingOne"
               data-bs-parent="#accordionExample"
             >
-              <div className="accordion-body">
-                <Lista />
-              </div>
+              <div className="accordion-body">{"JSXElement"}</div>
             </div>
           </div>
         </div>
@@ -37,7 +37,7 @@ const Accordion = () => {
   );
 };
 
-export default Accordion;
+export default AccordionComponent;
 
 /*
 

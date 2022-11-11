@@ -4,9 +4,11 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ChildFormCasoDetalle from "../components/childFormCasoDetalle";
 import { iCase } from "../interfaces/case";
-import Cookies from "universal-cookie";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
 import CasoConDetalle from "./casoConDetalle";
+import apiBonita from "../apis/ApiBonita";
+const { Cookies: kks } = require("react-cookie");
+const cok = new kks();
 
 const CasoDetalle = () => {
   const query = new URLSearchParams(useLocation().search);
@@ -20,6 +22,7 @@ const CasoDetalle = () => {
     console.log("caso en null");
   }
   const [show, setShow] = useState(true);
+  let [cantHumanTassk, setCantHumanTassk] = useState();
   const showModal = (view: boolean) => {
     setShow(view);
   };
@@ -37,19 +40,15 @@ const CasoDetalle = () => {
       setShow(false);
       return;
     }
-
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
+    let JSESSIONIDNODE = cok.get("JSESSIONIDNODE");
+    let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    console.log(axios.defaults.baseURL);
-    console.log(process.env.REACT_APP_BASE_URL_API);
-    axios
+    await axios
       .get(
         process.env.REACT_APP_GET_CASEFORID +
           id +
@@ -58,7 +57,7 @@ const CasoDetalle = () => {
       .then((resp) => {
         let result = resp;
         setCaseid(result.data);
-        console.log(result.data);
+
         setShow(true);
         return;
       })
@@ -68,6 +67,42 @@ const CasoDetalle = () => {
         return;
       });
     return;
+  };
+  const apigetListHumanTask = apiBonita.getListHumanTask("18");
+  console.log({ apigetListHumanTask });
+  console.log({ cantHumanTassk });
+
+  const apigetHumanTaskUserCase = apiBonita.getHumanTaskUserCase(
+    "18",
+    idCaso ? idCaso : "0"
+  );
+  console.log({ apigetHumanTaskUserCase });
+  console.log({ cantHumanTassk });
+
+  const getHumanTadk = async (user_id: string) => {
+    if (user_id != "") {
+      let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
+      axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+
+      axios.defaults.headers.post["Content-Type"] =
+        "application/json;charset=utf-8";
+      axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+      axios.defaults.withCredentials = true;
+      axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
+
+      await axios
+        .get("" + process.env.REACT_APP_LISTHUMANTASK + user_id)
+        .then((resp) => {
+          console.log("getHumanTadk", resp.data.length);
+          //setCantHumanTassk(resp.data.length);
+        })
+        .catch((error: any) => {
+          console.log(error);
+        });
+      return;
+    } else {
+      return;
+    }
   };
   const leerCaso = () => {
     if (idCaso == null || idCaso.length <= 0) {
@@ -88,6 +123,7 @@ const CasoDetalle = () => {
       if (show) {
         useEffect(() => {
           caseForId(idCaso);
+          //getHumanTadk("18");
         }, []);
         return (
           <>
@@ -111,6 +147,7 @@ const CasoDetalle = () => {
       } else {
         useEffect(() => {
           caseForId(idCaso);
+          //getHumanTadk("18");
         }, []);
         //caseForId(idCaso);
         if (show) {

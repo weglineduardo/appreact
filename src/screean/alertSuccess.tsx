@@ -11,9 +11,8 @@ const AlertSuccess: React.FC<Props> = ({ msj }) => {
 
   // const handleClose = () => setShow(false);
   // const handleShow = () => setShow(true);
-
-  return (
-    <>
+  const timerMsj = () => {
+    return (
       <div className="alert alert-dismissible alert-success">
         {/*<button
         type="button"
@@ -26,7 +25,9 @@ const AlertSuccess: React.FC<Props> = ({ msj }) => {
         </a>{" "}*/}
         {msj}
       </div>
-    </>
-  );
+    );
+  };
+
+  return <>{timerMsj()}</>;
 };
 export default AlertSuccess;

@@ -86,13 +86,11 @@ function CasoArchivadoId() {
   const [isVisible, setisVisible] = useState(false);
   const [inputId, setInputId] = useState<string>("1");
 
-  const [archivedCaseid, setArchivedCaseid] = useState<archivedCase>(
-    iarchivedCaseid
-  );
+  const [archivedCaseid, setArchivedCaseid] =
+    useState<archivedCase>(iarchivedCaseid);
   const LimpiarUseState = () => {
-    const [archivedCaseid, setArchivedCaseid] = useState<archivedCase>(
-      iarchivedCaseid
-    );
+    const [archivedCaseid, setArchivedCaseid] =
+      useState<archivedCase>(iarchivedCaseid);
   };
   useEffect(() => {
     if (!isVisible) {
@@ -124,7 +122,7 @@ function CasoArchivadoId() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
         "/bonita/API/bpm/archivedCase/?p=0&c=1&d=started_by&d=startedBySubstitute&d=processDefinitionId&f=sourceObjectId=" +
           id

@@ -58,8 +58,9 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
   console.log("processId 1", processId);
 
   const addComment = async (caseId: string, comment: string) => {
-    addCommentFetch(casoId, comment);
-    getListComment(casoId);
+    await addCommentFetch(casoId, comment);
+    await getListComment(casoId);
+    //getListComment(casoId);
   };
 
   const getComments = async (caseId: string) => {
@@ -99,7 +100,6 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
         if (!result.ok) {
           console.log("!result.ok", result);
           setCreado(false);
-          console.log("¿ Se ha creado ? : ", creado);
           return;
         }
 
@@ -108,7 +108,6 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
           JSON.stringify(result.body)
         );
         setCreado(true);
-        console.log("¿ Se ha creado ? : ", creado);
         console.log(result.body);
         showAlert();
         return;
@@ -116,7 +115,6 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
       .catch((error) => {
         console.log("error fetch ------", error);
         setCreado(false);
-        console.log("¿ Se ha creado ? : ", creado);
         return;
       });
     return;
@@ -127,7 +125,7 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(process.env.REACT_APP_LISTCOMMENT + caseId + "&d=userId&t=0")
       .then((resp) => {
         let result = resp;

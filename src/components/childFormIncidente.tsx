@@ -49,8 +49,6 @@ const ChildFormIncidente: React.FC<Props> = ({
   ) => {
     await getProcessName("ServiceRequest");
     console.log("processId createcase :", sprocessId);
-    //usuarioActivo();
-    console.log("sprocessId :", sprocessId);
     if (sprocessId == "") {
       console.log("sprocessId vacio ", sprocessId);
       await getProcessName("ServiceRequest");
@@ -63,7 +61,7 @@ const ChildFormIncidente: React.FC<Props> = ({
     }
     if (creado) {
       console.log("fin crearIncidente valor de creado", creado);
-      showAlert;
+      showAlert();
     }
   };
   const createCaseBonitaFechOk = async (processId: string) => {
@@ -108,10 +106,8 @@ const ChildFormIncidente: React.FC<Props> = ({
     RequestInit.method = "POST";
 
     const BASE_URL =
-      process.env.REACT_APP_BASE_URL_API +
-      "/bonita/API/bpm/process/" +
-      processId +
-      "/instantiation";
+      "" + process.env.REACT_APP_BASE_URL_API + process.env.REACT_APP_POST_CASE;
+    +processId + "/instantiation";
     console.log("RequestInit", RequestInit);
 
     await fetch(BASE_URL, RequestInit)
@@ -181,7 +177,12 @@ const ChildFormIncidente: React.FC<Props> = ({
       axios.defaults.withCredentials = true;
       axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
       await axios
-        .get("/bonita/API/bpm/process?c=10&p=0&f=name=" + processName)
+        .get(
+          "" +
+            process.env.REACT_APP_BASE_URL_API +
+            process.env.REACT_APP_GET_PROCESSNAME +
+            processName
+        )
         .then((resp) => {
           setProcessId(resp.data[0].id);
         })
@@ -307,145 +308,3 @@ const ChildFormIncidente: React.FC<Props> = ({
 };
 
 export default ChildFormIncidente;
-
-/* const navigate = useNavigate();
-
-  const navigateTo = (routeUrl: string) => {
-    const url = `/${routeUrl}`;
-    console.log("navigateTo navigateTo", url);
-    navigate(url);
-  };
-  function createcase(
-  sprocessId: string,
-  setProcessId: React.Dispatch<React.SetStateAction<string>>,
-  alarma: string,
-  descripcion: string,
-  prioridad: string
-) {
-  usuarioActivo;
-  console.log("sprocessId 1", sprocessId);
-  getProcessName("ServiceRequest");
-  if (sprocessId == "") {
-    getProcessName("ServiceRequest");
-  }
-
-  createCaseBonitaFechOk(sprocessId.toString(), alarma, prioridad, descripcion);
-  console.log("sprocessId.toString() 1", sprocessId);
-
-  async function usuarioActivo() {
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-
-    await axios
-      .get(process.env.REACT_APP_API_USERACTIVE)
-      .then((resp) => {
-        let result = resp;
-        console.log(result.data);
-        window.localStorage.setItem("usuario", JSON.stringify(result.data));
-        let storrageUser = JSON.stringify(
-          window.localStorage.getItem("usuario")
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  }
-  async function createCaseBonitaFechOk(
-    processId: string,
-    alarma: string,
-    descripcion: string,
-    prioridad: string
-  ) {
-    console.log("createCaseBonitaFechOk : ", processId);
-    if (processId === "") {
-      console.log("llego vacio el processID : ", processId);
-      return;
-    }
-    console.log("processId", processId);
-    const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-    console.log(X_Bonita_API_Token);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("X-Bonita-API-Token", X_Bonita_API_Token);
-    var urlencoded = new URLSearchParams();
-
-    const raw = JSON.stringify({
-      serviceRequestInput: {
-        alarma: alarma,
-        descripcion: descripcion,
-        prioridad: "Alta",
-        estado: "",
-      },
-    });
-    const RequestInit: RequestInit = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-      credentials: "include",
-    };
-    RequestInit.method = "POST";
-
-    const BASE_URL =
-      process.env.REACT_APP_BASE_URL_API +
-      "/bonita/API/bpm/process/" +
-      processId +
-      "/instantiation";
-    console.log("RequestInit", RequestInit);
-
-    await fetch(BASE_URL, RequestInit)
-      .then((result) => {
-        if (!result.ok) {
-          console.log("!result.ok", result);
-          return;
-        }
-        window.localStorage.setItem(
-          "createCaseBonitaFechOk",
-          JSON.stringify(result.body)
-        );
-        console.log(result);
-        console.log(result.status);
-
-        return;
-      })
-      .catch((error) => {
-        console.log("error fetch ------", error);
-        return;
-      });
-  }
-
-  async function getProcessName(processName: string) {
-    if (processName != "") {
-      const cookies = new Cookies();
-      let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-      let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-      axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-      axios.defaults.headers.post["Content-Type"] =
-        "application/json;charset=utf-8";
-      axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-      axios.defaults.withCredentials = true;
-      axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
-      await axios
-        .get("/bonita/API/bpm/process?c=10&p=0&f=name=" + processName)
-        .then((resp) => {
-          let result = resp;
-          setProcessId(resp.data[0].id);
-        })
-        .catch((error: any) => {
-          console.log("processName: string", processName);
-          console.log(error);
-        });
-      return;
-    } else {
-      console.log("processName: string", processName);
-      return;
-    }
-  }
-}
-*/

@@ -4,7 +4,6 @@ const cok = new kks();
 import React, { useState, useContext } from "react";
 import { AuthProvider } from "../auth/AuthProvider";
 import { iUsuario } from "../interfaces/usuario";
-import { JsonConvert, ValueCheckingMode } from "json2typescript";
 import axios from "axios";
 
 export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -69,7 +68,6 @@ function useAuth(): { user: boolean } {
     "is_technical_user": string;
     "version": string;
   }
-  let jsonConvert: JsonConvert = new JsonConvert();
   let useract: iUsuario = {
     copyright: "",
     is_guest_user: "",
@@ -85,12 +83,6 @@ function useAuth(): { user: boolean } {
   const usuario = window.localStorage.getItem("usuario")
     ? window.localStorage.getItem("usuario")
     : "";
-  //console.log("function useAuth(): { user: iUsuario }", usuario);
-  const convertedNewClassesArray = jsonConvert.deserializeObject(useract, rs);
-  console.log(
-    "convertedNewClassesArray.branding_version_with_date",
-    convertedNewClassesArray.branding_version_with_date
-  );
 
   if (!usuario) {
     return { user: false };

@@ -400,14 +400,6 @@ class BonitaApi {
         "Cookie",
         "bonita.tenant=1; BOS_Locale=es; Cookie_1=value; JSESSIONID=315C016B8F6C765335240F11C679C194; X-Bonita-API-Token=cacd21d9-56bc-4890-a8e4-e63e43360087"
       );
-      /* myHeaders.append(
-        "Content-type",
-        "application/json",
-        "X-Bonita-API-Token",
-        { X_Bonita_API_Token },
-        "Cookie",
-        `bonita.tenant=1; BOS_Locale=es; X-Bonita-API-Token=${X_Bonita_API_Token}`
-      );*/
       let raw = JSON.stringify({
         serviceRequestInput: {
           alarma: "esta es la alarma 2222",
@@ -425,8 +417,10 @@ class BonitaApi {
         redirect: "follow",
       };
       const BASE_URL =
+        "" +
         process.env.REACT_APP_BASE_URL_API +
-        "/bonita/API/bpm/process/7187029084818193889/instantiation";
+        process.env.REACT_APP_POST_CASE;
+      ("7187029084818193889/instantiation");
 
       return await fetch(BASE_URL, requestOptions)
         .then((result) => {
@@ -456,119 +450,3 @@ class BonitaApi {
   }
 }
 export default BonitaApi;
-//module.exports = BonitaApi;
-/*
-    async function caseBonita() {
-      const myHeaders = new Headers();
-      myHeaders.append(
-        "X-Bonita-API-Token=add93259-565e-40e3-bd12-f62d78a197ef"
-      );
-
-      const urlencoded = new URLSearchParams();
-
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        body: urlencoded,
-        redirect: "follow",
-      };
-      const BASE_URL =
-        process.env.REACT_APP_BASE_URL_API + "/bonita/API/bpm/case/4001";
-      console.log("BASE_URL+++++++", BASE_URL);
-      console.log("requestOptions +++++++", requestOptions);
-      console.log("myHeaders +++++++", myHeaders);
-      return await fetch(BASE_URL, requestOptions)
-        .then((result) => {
-          if (!result.ok) {
-            throw Error(result.status);
-          }
-          console.log(result);
-          return;
-          //return getAuthToken();
-        })
-        .catch((error) => {
-          console.log("error fetch", error);
-          return;
-          /*document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Login error. " + error;
-        });
-    }
-
-    function getAuthToken() {
-      var myHeaders = new Headers();
-      var requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        credentials: "include",
-      };
-      const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
-      return fetch(BASE_URL + "/API/system/session/unusedId", requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.status);
-          }
-          return response.headers.get("x-bonita-api-token");
-        })
-        .catch((error) => {
-          document.getElementById("error").innerHTML +=
-            "<br/> &#x26a0; Unable to retrieve authentication token from session. " +
-            error;
-        });
-    }
-
-    async function componentDidMount() {
-      const ufa = await fetch("http://localhost:5300/api", {
-        method: "GET", // *GET, POST, PUT, DELETE, etc.
-        mode: "no-cors", // no-cors, *cors, same-origin
-        //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-        //credentials: "same-origin", // include, *same-origin, omit
-        headers: {
-          "Content-Type": "application/json;charset=utf-8",
-          "Access-Control-Allow-Origin": "http://localhost:443",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          return res;
-        })
-        .then((res) => {
-          const ressetState = {
-            url: res.url,
-            status: res.status,
-          };
-          console.log(ressetState);
-        });
-      return ufa;
-    }
-*/
-/*
-
-var axios = require("axios");
-var qs = require("qs");
-var data = qs.stringify({
-  username: "walter.bates",
-  password: "bpm",
-  redirect: "false",
-});
-var config = {
-  method: "get",
-  url: "https://synbonitalab.az.synchro.ar/bonita/API/bpm/case/4001",
-  headers: {
-    "Content-Type": "application/x-www-form-urlencoded",
-    Cookie:
-      "JSESSIONID=EE429F63A29E62D288EBE6CD3A0F56A1; X-Bonita-API-Token=0eb1484d-2790-42d6-8e8d-4a8d0830a4fc; bonita.tenant=1; BOS_Locale=en",
-  },
-  data: data,
-};
-
-axios(config)
-  .then(function (response) {
-    console.log(JSON.stringify(response.data));
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-
-  */

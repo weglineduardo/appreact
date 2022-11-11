@@ -12,6 +12,7 @@ import CasoDetalle from "./screean/caso-detalle";
 import Home from "./screean/home";
 import NuevoIncidente from "./screean/nuevo-incidente";
 import NuevoServiceRequest from "./screean/nuevo-Service-Request";
+import Tareas from "./screean/tareas";
 
 export default function AppRouterV1() {
   return (
@@ -41,6 +42,15 @@ export default function AppRouterV1() {
         element={
           <ProtectedRoute>
             <App />
+          </ProtectedRoute>
+        }
+        errorElement={<ErrorPage />}
+      />
+      <Route
+        path="/tareas"
+        element={
+          <ProtectedRoute>
+            <Tareas />
           </ProtectedRoute>
         }
         errorElement={<ErrorPage />}

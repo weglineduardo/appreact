@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { JsonSerializer, throwError } from "typescript-json-serializer";
-
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
@@ -23,8 +20,6 @@ function CaseById() {
   type caseId = iCase;
   const [inputId, setInputId] = useState<string>("");
   const [caseid, setCaseid] = useState<caseId[]>([]);
-  let defaultSerializer = new JsonSerializer();
-  let jsonConvert: JsonConvert = new JsonConvert();
   const [comments, setComments] = useState([undefined]);
 
   const [jcomments, setjComments] = useState([undefined]);
@@ -44,7 +39,7 @@ function CaseById() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(process.env.REACT_APP_GET_CASEFORID + id)
       .then((resp) => {
         let result = resp;

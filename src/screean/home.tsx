@@ -53,13 +53,12 @@ function Home() {
     sprocessId: string,
     isetProcessId: React.Dispatch<React.SetStateAction<string>>
   ) => {
-    getProcessName("ServiceRequest");
+    await getProcessName("ServiceRequest");
     console.log("processId createcase :", sprocessId);
     usuarioActivo();
-    console.log("sprocessId :", sprocessId);
     if (sprocessId == "") {
       console.log("sprocessId vacio ", sprocessId);
-      getProcessName("ServiceRequest");
+      await getProcessName("ServiceRequest");
       createCaseBonitaFechOk(sprocessId);
       console.log("if () :", sprocessId);
     } else {
@@ -97,8 +96,9 @@ function Home() {
     RequestInit.method = "POST";
 
     const BASE_URL =
+      "" +
       process.env.REACT_APP_BASE_URL_API +
-      "/bonita/API/bpm/process/" +
+      process.env.REACT_APP_POST_CASE +
       processId +
       "/instantiation";
     //console.log("RequestInit", RequestInit);
@@ -164,7 +164,7 @@ function Home() {
       axios.defaults.withCredentials = true;
       axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
       await axios
-        .get("/bonita/API/bpm/process?c=10&p=0&f=name=" + processName)
+        .get("" + process.env.REACT_APP_GET_PROCESSNAME + processName)
         .then((resp) => {
           let result = resp;
           setProcessId(resp.data[0].id);

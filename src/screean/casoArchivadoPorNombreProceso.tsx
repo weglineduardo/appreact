@@ -122,7 +122,7 @@ function CasoArchivadoPorNombreProceso() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
         "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&t=0&s=" +
           name +

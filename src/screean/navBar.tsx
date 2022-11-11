@@ -5,8 +5,6 @@ import React, { useState, useEffect } from "react";
 import { iUsuario } from "../interfaces/usuario";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
-import { JsonSerializer } from "typescript-json-serializer";
-import { JsonConvert } from "json2typescript";
 
 //import "../App.css";
 
@@ -28,8 +26,6 @@ function NavBar() {
   const [serviceLogin, setServiceLogin] = useState("");
   const [usuario, setUsuario] = useState<iUarioActivo>();
   const [caseList, setCaseList] = useState([]);
-  let defaultSerializer = new JsonSerializer();
-  let jsonConvert: JsonConvert = new JsonConvert();
 
   useEffect(() => {
     //console.log(caseList.forEach((c) => console.log(c)));
@@ -106,7 +102,7 @@ function NavBar() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get("/bonita/logoutservice?redirect=false")
       .then((resp) => {
         window.localStorage.removeItem("setServiceLogin");
@@ -134,12 +130,11 @@ function NavBar() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
-        let rr = jsonConvert.deserializeObject(result.data, rs);
         console.log(
           "usuario.user_id",
           usuario ? usuario.user_id : "sin usuario.user_id"
@@ -172,7 +167,7 @@ function NavBar() {
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
 
-    axios
+    await axios
       .get(process.env.REACT_APP_GET_CASEFORID + "4001")
       .then((resp) => {
         let result = resp;
@@ -200,7 +195,7 @@ function NavBar() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
         "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
       )
@@ -283,6 +278,81 @@ function NavBar() {
                   Home
                   <span className="visually-hidden">(current)</span>
                 </a>
+              </li>
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  href="#"
+                  role="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Tareas
+                </a>
+                <div className="dropdown-menu" id="usuario">
+                  <a className="dropdown-item" href="/tareas">
+                    Todas las tareas
+                  </a>
+
+                  <div>
+                    <li className="dropdown-submenu">
+                      <a className="dropdown-item dropdown-toggle" href="">
+                        Buscar tarea
+                      </a>
+                      <ul className="dropdown-menu">
+                        <li className="dropdown-submenu">
+                          <a className="dropdown-item dropdown-toggle" href="#">
+                            Abiertos
+                          </a>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a className="dropdown-item" href="/casebyid">
+                                Por id
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="dropdown-item"
+                                href="/caseByNameProcess"
+                              >
+                                Por proceso
+                              </a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li className="dropdown-submenu">
+                          <a className="dropdown-item dropdown-toggle" href="#">
+                            Cerradas
+                          </a>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a
+                                className="dropdown-item"
+                                href="/casearchivedbyid"
+                              >
+                                Por id
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="dropdown-item"
+                                href="/caseArchivedByNameProcess"
+                              >
+                                Por Proceso
+                              </a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </div>
+
+                  <div className="dropdown-divider"></div>
+                  <a className="dropdown-item" href="#">
+                    Ayuda
+                  </a>
+                </div>
               </li>
               <li className="nav-item dropdown">
                 <a
@@ -419,138 +489,3 @@ function NavBar() {
 }
 
 export default NavBar;
-
-/*  
-
-
-  // localhost:8080/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/process?c=9999&
-  const logoutservice = async () => {
-    const endpoint =
-      "http://localhost:8080/bonita/logoutservice?redirect=false";
-
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    axios
-      .get("/bonita/logoutservice?redirect=false")
-      .then((resp) => {
-        let result = resp;
-        setServiceLogin(JSON.stringify(result.status));
-        console.log(result);
-      })
-      .catch((error) => {
-        setServiceLogin(error);
-        console.log(error);
-      });
-  };
-
-  const axiosGetCaseList = async () => {
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
-
-    ////////////
-    axios
-      .get("/bonita/API/bpm/case/4001")
-      .then((resp) => {
-        let result = resp;
-
-        console.log(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  };
-
-  const obtenerProcess = async () => {
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    console.log("X_Bonita_API_Token axios obtenercase", X_Bonita_API_Token);
-
-    ////////////
-    axios
-      .get(
-        "/bonita/API/bpm/case?p=0&c=10&f=processDefinitionId=6523828445512427595" //"6523828445512427595"
-      )
-      .then((resp) => {
-        let result = resp;
-        console.log(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  };
-
-  const axioslogin = async () => {
-    const endpoint =
-      "http://localhost:8080/bonita/loginservice?username=walter.bates&password=bpm&redirect=true";
-
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios
-      .get(
-        "/bonita/loginservice?username=walter.bates&password=bpm&redirect=true"
-      )
-      .then((resp) => {
-        //console.log("resp JSON.stringif = ", JSON.stringify(resp));
-
-        let result = resp; //resp.data;
-        console.log(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const loginService = async () => {
-    axioslogin();
-    const cok = new kks();
-
-    sessionStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
-    sessionStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));
-    localStorage.setItem("JSESSIONID", cok.get("JSESSIONID"));
-    localStorage.setItem("X-Bonita-API-Token", cok.get("X-Bonita-API-Token"));
-  };
-  const fetchCases = async () => {
-    fetchCase();
-  };
-
-  const unusedIdFechService = async () => {
-    unusedIdFetch();
-  };
-const getCase = async () => {
-    const cookies = new Cookies();
-    //let JSESSIONID = cookies.get("JSESSIONID");
-    let JSESSIONID = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    console.log(
-      "JSESSIONID, X_Bonita_API_Token  getcase aqui ",
-      JSESSIONID,
-      X_Bonita_API_Token
-    );
-
-    //console.log("cookies.getAll()", cookies.getAll());
-    bonitaCase(JSESSIONID, X_Bonita_API_Token);
-  };
-  const getProcess = async () => {
-    obtenerProcess();
-  };*/

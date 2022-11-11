@@ -1,16 +1,39 @@
-import Accordion from "./screean/acordion";
-import NavBar from "./screean/navBar";
-import fetchBonitaLogin from "./components/fetchBonitaLogin";
-import fetchCase from "./components/fetchCase";
-import unusedIdFetch from "./components/unusedIdFetch";
+import Accordion from "./acordion";
+import NavBar from "./navBar";
+import fetchBonitaLogin from "../components/fetchBonitaLogin";
+import fetchCase from "../components/fetchCase";
+import unusedIdFetch from "../components/unusedIdFetch";
 import React, { useState, useContext } from "react";
-import bonitaCase from "./components/bonitaCase";
+import bonitaCase from "../components/bonitaCase";
 import Cookies from "universal-cookie";
 import { Cookies as kks } from "react-cookie";
 import axios from "axios";
-import "./App.css";
+import Lista from "./lista";
+import "../App.css";
+import NavBarMaster from "./NavBarMaster";
+import AccordionComponent from "../components/acordionComponent";
+import { PruebaAcordion } from "../hooks/PruebaAcordion";
+import ListaTareas from "./lista-tareas";
+import AccordionTarea from "./acordionTareas";
 
-function App() {
+function Tareas() {
+  return (
+    <>
+      <div className="App">
+        <NavBar />
+        <AccordionTarea />
+        {/*<PruebaAcordion>
+          <ListaTareas />
+        </PruebaAcordion>*/}
+      </div>
+    </>
+  );
+}
+
+export default Tareas;
+
+//no borrar
+/*  
   const [serviceLogin, setServiceLogin] = useState("");
 
   const axioslogin = async () => {
@@ -47,7 +70,9 @@ function App() {
   const fetchCases = async () => {
     fetchCase();
   };
-  const obtenerCookiesNode = async () => {
+
+
+const obtenerCookiesNode = async () => {
     let config = {
       method: "get",
       mode: "no-cors",
@@ -141,60 +166,4 @@ function App() {
       isd = false;
     }
     return isd;
-  };
-  return (
-    <>
-      <div className="App">
-        <NavBar />
-        <Accordion />
-        <header className="App-header">
-          {/*<img src={logo} className="App-logo" alt="logo" />
-         <Accordion key={"hero.id"} />*/}
-        </header>
-      </div>
-    </>
-  );
-}
-
-export default App;
-
-/*
-      {() => (isLogin() ? <NavBar /> : <></>)}
-        <button
-          onClick={obtenerCookiesNode}
-          type="button"
-          className="btn btn-primary"
-        >
-          Obtener cookies Node
-        </button>
-        <button
-          onClick={fetchLoginService}
-          type="button"
-          className="btn btn-primary"
-        >
-          Fetch Login
-        </button>
-        <button
-          onClick={usuarioActivo}
-          type="button"
-          className="btn btn-primary"
-        >
-          Axioa usuario activo
-        </button>
-        <button onClick={fetchCases} type="button" className="btn btn-primary">
-          Case fetch
-        </button>
-        <button
-          onClick={loginService}
-          type="button"
-          className="btn btn-primary"
-        >
-          Login
-        </button>
-        <button onClick={obtenerCase} type="button" className="btn btn-primary">
-          Get case
-        </button>
-        <button onClick={getProcess} type="button" className="btn btn-primary">
-          Get process
-        </button>
-*/
+  }; */

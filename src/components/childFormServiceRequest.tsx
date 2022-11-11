@@ -1,7 +1,11 @@
-import React, { useState, useContext } from "react";
-import Cookies from "universal-cookie";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
-import AlertDanger from "../screean/alertDanger";
+import {
+  Navigate,
+  redirect,
+  BrowserRouter,
+  useNavigate,
+} from "react-router-dom";
 import AlertSuccess from "../screean/alertSuccess";
 import DateTimePicker from "./dateTimePicker";
 const { Cookies: kks } = require("react-cookie");
@@ -28,20 +32,25 @@ const ChildFormServiceRequest: React.FC<Props> = ({
   routeUrl,
   style,
 }) => {
+  let [createCaseId, setCreateCaseId] = useState({});
   let [processId, setProcessId] = useState("");
+  useEffect(() => {
+    getProcessName("ServiceRequest");
+  }, []);
   const [alarma, setAlarma] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [creado, setCreado] = useState(false);
-  const [show, setShow] = useState(false);
   const [prioridad, setPrioridad] = useState("");
   const [torre, setTorre] = useState("");
   const [ci, setCi] = useState("");
   const [fechaEsperada, setFechaEsperada] = useState("");
   const Style = `card border-primary mb-${style}`;
-
-  console.log("processId 1", processId);
-
-  const crearIncidente = async (
+  const navigate = useNavigate();
+  const navigateTo = (routeUrl: string) => {
+    const url = `${routeUrl}`;
+    navigate(url);
+  };
+  const createRequerimiento = async (
     sprocessId: string,
     isetProcessId: React.Dispatch<React.SetStateAction<string>>,
     alarma: string,
@@ -52,28 +61,24 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     fechaEsperada: string
   ) => {
     await getProcessName("ServiceRequest");
-    console.log("processId createcase :", sprocessId);
-    //usuarioActivo();
-    console.log("sprocessId :", sprocessId);
+
     if (sprocessId == "") {
       console.log("sprocessId vacio ", sprocessId);
       await getProcessName("ServiceRequest");
-      //usuarioActivo();
       await createCaseBonitaFechOk(sprocessId);
-      console.log("if () :", sprocessId);
     } else {
-      console.log(" else createCaseBonitaFechOk:", sprocessId);
       await createCaseBonitaFechOk(sprocessId);
     }
     if (creado) {
-      console.log("fin crearIncidente valor de creado", creado);
-      showAlert;
+      showAlert();
     }
+    setTimeout(function() {
+      navigateTo("/app");
+    }, 4000);
   };
   const createCaseBonitaFechOk = async (processId: string) => {
     if (processId === "") {
       console.log("llego vacio el processID : ", processId);
-      console.log("¿ Se ha creado ? : ", creado);
       return;
     }
     const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
@@ -112,36 +117,37 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     RequestInit.method = "POST";
 
     const BASE_URL =
+      "" +
       process.env.REACT_APP_BASE_URL_API +
-      "/bonita/API/bpm/process/" +
+      process.env.REACT_APP_POST_CASE +
       processId +
       "/instantiation";
-    console.log("RequestInit", RequestInit);
 
     await fetch(BASE_URL, RequestInit)
-      .then((result) => {
-        if (!result.ok) {
-          console.log("!result.ok", result);
+      .then((response) => {
+        if (!response.ok) {
+          console.log("!result.ok", response);
           setCreado(false);
-          console.log("¿ Se ha creado ? : ", creado);
+
           return;
         }
 
+        readCreateCase(response);
+        console.log("readCreateCase", JSON.stringify(response));
+        console.log("readCreateCase", JSON.stringify(response.status));
+        console.log("readCreateCase", response);
         window.localStorage.setItem(
           "createCaseBonitaFechOk",
-          JSON.stringify(result.body)
+          JSON.stringify({ response })
         );
         setCreado(true);
-        console.log("¿ Se ha creado ? : ", creado);
-        console.log(result);
-        console.log(result.body);
-        showAlert();
+        console.log(response.body);
+
         return;
       })
       .catch((error) => {
         console.log("error fetch ------", error);
         setCreado(false);
-        console.log("¿ Se ha creado ? : ", creado);
         return;
       });
     return;
@@ -173,10 +179,8 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     return;
   };
   const getProcessName = async (processName: string) => {
-    console.log("processName: string", processName);
     if (processName != "") {
-      const cookies = new Cookies();
-      let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
+      let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
       axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
       axios.defaults.headers.post["Content-Type"] =
@@ -185,27 +189,84 @@ const ChildFormServiceRequest: React.FC<Props> = ({
       axios.defaults.withCredentials = true;
       axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
       await axios
-        .get("/bonita/API/bpm/process?c=10&p=0&f=name=" + processName)
+        .get("" + process.env.REACT_APP_GET_PROCESSNAME + processName)
         .then((resp) => {
           setProcessId(resp.data[0].id);
         })
         .catch((error: any) => {
-          console.log("processName: string", processName);
           console.log(error);
         });
       return;
     } else {
-      console.log("processName: string", processName);
+      return;
+    }
+  };
+  const getHumanTadk = async (user_id: string) => {
+    if (user_id != "") {
+      let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
+      axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+
+      axios.defaults.headers.post["Content-Type"] =
+        "application/json;charset=utf-8";
+      axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+      axios.defaults.withCredentials = true;
+      axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
+      await axios
+        .get("" + process.env.REACT_APP_LISTHUMANTASK + user_id)
+        .then((resp) => {
+          setProcessId(resp.data[0].id);
+        })
+        .catch((error: any) => {
+          console.log(error);
+        });
+      return;
+    } else {
       return;
     }
   };
   const showAlert = () => {
     if (creado) {
-      return <AlertSuccess msj={"Incidente creado Numero"} />;
+      return (
+        <>
+          {/* <Modals id={"vemos o no el modal "} isShow={true} />
+          
+          <AlertSuccess msj={"Requerimiento creado Numero:" + createCaseId} />*/}
+          <AlertSuccess
+            msj={"Requerimiento creado Numero:" + { createCaseId }}
+          />
+          <div
+            className="toast show"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+          >
+            <div className="toast-header">
+              <strong className="me-auto">Requerimiento Creado</strong>
+              <small>11 mins ago</small>
+              <button
+                type="button"
+                className="btn-close ms-2 mb-1"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+                onClick={() => {
+                  setCreado(false);
+                }}
+              >
+                <span aria-hidden="true"></span>
+              </button>
+            </div>
+            <div className="toast-body">Se creo el caso numero :</div>
+          </div>
+          {/*JSON.stringify(createCaseId)*/}
+        </>
+      );
     } else {
-      return <AlertDanger msj={"NO pudimos crear el incidente"} />;
+      return <div></div>;
     }
   };
+  function readCreateCase(body: {}) {
+    setCreateCaseId(body);
+  }
 
   return (
     <div>
@@ -330,9 +391,10 @@ const ChildFormServiceRequest: React.FC<Props> = ({
             </fieldset>
           </form>
         </div>
+        {showAlert()}
         <button
           onClick={() =>
-            crearIncidente(
+            createRequerimiento(
               processId,
               setProcessId,
               alarma,
@@ -353,145 +415,3 @@ const ChildFormServiceRequest: React.FC<Props> = ({
 };
 
 export default ChildFormServiceRequest;
-
-/* const navigate = useNavigate();
-
-  const navigateTo = (routeUrl: string) => {
-    const url = `/${routeUrl}`;
-    console.log("navigateTo navigateTo", url);
-    navigate(url);
-  };
-  function createcase(
-  sprocessId: string,
-  setProcessId: React.Dispatch<React.SetStateAction<string>>,
-  alarma: string,
-  descripcion: string,
-  prioridad: string
-) {
-  usuarioActivo;
-  console.log("sprocessId 1", sprocessId);
-  getProcessName("ServiceRequest");
-  if (sprocessId == "") {
-    getProcessName("ServiceRequest");
-  }
-
-  createCaseBonitaFechOk(sprocessId.toString(), alarma, prioridad, descripcion);
-  console.log("sprocessId.toString() 1", sprocessId);
-
-  async function usuarioActivo() {
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-
-    await axios
-      .get(process.env.REACT_APP_API_USERACTIVE)
-      .then((resp) => {
-        let result = resp;
-        console.log(result.data);
-        window.localStorage.setItem("usuario", JSON.stringify(result.data));
-        let storrageUser = JSON.stringify(
-          window.localStorage.getItem("usuario")
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  }
-  async function createCaseBonitaFechOk(
-    processId: string,
-    alarma: string,
-    descripcion: string,
-    prioridad: string
-  ) {
-    console.log("createCaseBonitaFechOk : ", processId);
-    if (processId === "") {
-      console.log("llego vacio el processID : ", processId);
-      return;
-    }
-    console.log("processId", processId);
-    const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-    console.log(X_Bonita_API_Token);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("X-Bonita-API-Token", X_Bonita_API_Token);
-    var urlencoded = new URLSearchParams();
-
-    const raw = JSON.stringify({
-      serviceRequestInput: {
-        alarma: alarma,
-        descripcion: descripcion,
-        prioridad: "Alta",
-        estado: "",
-      },
-    });
-    const RequestInit: RequestInit = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-      credentials: "include",
-    };
-    RequestInit.method = "POST";
-
-    const BASE_URL =
-      process.env.REACT_APP_BASE_URL_API +
-      "/bonita/API/bpm/process/" +
-      processId +
-      "/instantiation";
-    console.log("RequestInit", RequestInit);
-
-    await fetch(BASE_URL, RequestInit)
-      .then((result) => {
-        if (!result.ok) {
-          console.log("!result.ok", result);
-          return;
-        }
-        window.localStorage.setItem(
-          "createCaseBonitaFechOk",
-          JSON.stringify(result.body)
-        );
-        console.log(result);
-        console.log(result.status);
-
-        return;
-      })
-      .catch((error) => {
-        console.log("error fetch ------", error);
-        return;
-      });
-  }
-
-  async function getProcessName(processName: string) {
-    if (processName != "") {
-      const cookies = new Cookies();
-      let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-      let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-      axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-      axios.defaults.headers.post["Content-Type"] =
-        "application/json;charset=utf-8";
-      axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-      axios.defaults.withCredentials = true;
-      axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
-      await axios
-        .get("/bonita/API/bpm/process?c=10&p=0&f=name=" + processName)
-        .then((resp) => {
-          let result = resp;
-          setProcessId(resp.data[0].id);
-        })
-        .catch((error: any) => {
-          console.log("processName: string", processName);
-          console.log(error);
-        });
-      return;
-    } else {
-      console.log("processName: string", processName);
-      return;
-    }
-  }
-}
-*/

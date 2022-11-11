@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-("json2typescript");
+
 import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
@@ -11,7 +11,7 @@ import Icons from "../components/icons";
 import AlertDanger from "./alertDanger";
 import { iUsuario } from "../interfaces/usuario";
 
-function Lista() {
+const Lista = () => {
   let iUarioActivo: iUsuario = {
     copyright: "",
     is_guest_user: "",
@@ -51,6 +51,7 @@ function Lista() {
   const obtenerCaseList = async (user_id: string) => {
     //await usuarioActivo();
     let userId = usuario.user_id;
+    console.log({ userId });
     const cookies = new Cookies();
     console.log("usuario", usuario);
     console.log("serviceLogin", serviceLogin);
@@ -61,7 +62,7 @@ function Lista() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
         "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=20&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=" +
           userId +
@@ -92,7 +93,7 @@ function Lista() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
@@ -118,11 +119,9 @@ function Lista() {
   useEffect(() => {
     usuarioActivo();
   }, []);
-  //useLayoutEffect(() => {
-  //  usuarioActivo();
-  //}, []);
 
   //#endregion
+
   //#region obtenerArchivedActivity
   const obtenerArchivedActivity = async () => {
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
@@ -130,9 +129,10 @@ function Lista() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
-        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=" +
+        "" +
+          process.env.REACT_APP_LISTCASEACTIVED +
           usuario.user_id +
           "&t=0&o=startDate+DESC"
       )
@@ -165,7 +165,7 @@ function Lista() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(process.env.REACT_APP_GET_CASEFORID + id)
       .then((resp) => {
         let result = resp;
@@ -349,7 +349,7 @@ function Lista() {
       </div>
     </>
   );
-}
+};
 
 export default Lista;
 

@@ -141,7 +141,7 @@ function casoActivoId() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
         process.env.REACT_APP_GET_CASEFORID +
           id +

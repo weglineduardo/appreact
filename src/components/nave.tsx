@@ -14,8 +14,6 @@ import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 
 import { idText } from "typescript";
-import { JsonSerializer } from "typescript-json-serializer";
-import { JsonConvert, ValueCheckingMode } from "json2typescript";
 
 const ButtonComponent = () => {
   const navigate = useNavigate();
@@ -50,8 +48,6 @@ const ButtonComponent = () => {
   const [serviceLogin, setServiceLogin] = useState("");
   const [usuario, setUsuario] = useState<iUarioActivo>();
   const [caseList, setCaseList] = useState([]);
-  let defaultSerializer = new JsonSerializer();
-  let jsonConvert: JsonConvert = new JsonConvert();
   //#region
   //#region Login
   const fetchLoginService = async () => {
@@ -120,13 +116,12 @@ const ButtonComponent = () => {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
 
-        let rr = jsonConvert.deserializeObject(result.data, rs);
         console.log("rr", usuario ? usuario.branding_version : "sin datos");
         console.log(result.data);
         handleClick;

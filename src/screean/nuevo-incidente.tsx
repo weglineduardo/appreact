@@ -10,7 +10,6 @@ const cok = new kks();
 function NuevoIncidente() {
   let [processId, setProcessId] = useState("");
   const [show, setShow] = useState(false);
-  console.log("processId 1", processId);
   const showModal = (view: boolean) => {
     setShow(view);
   };
@@ -59,15 +58,15 @@ function NuevoIncidente() {
 
 export default NuevoIncidente;
 
-function createcase(
+async function createcase(
   sprocessId: string,
   setProcessId: React.Dispatch<React.SetStateAction<string>>
 ) {
   usuarioActivo;
   console.log("sprocessId 1", sprocessId);
-  getProcessName("ServiceRequest");
+  await getProcessName("ServiceRequest");
 
-  createCaseBonitaFechOk(sprocessId.toString());
+  await createCaseBonitaFechOk(sprocessId.toString());
   console.log("sprocessId.toString() 1", sprocessId);
 
   async function usuarioActivo() {
@@ -134,8 +133,9 @@ function createcase(
     RequestInit.method = "POST";
 
     const BASE_URL =
+      "" +
       process.env.REACT_APP_BASE_URL_API +
-      "/bonita/API/bpm/process/" +
+      process.env.REACT_APP_POST_CASE +
       processId +
       "/instantiation";
     console.log("RequestInit", RequestInit);
@@ -144,12 +144,8 @@ function createcase(
       .then((result) => {
         if (!result.ok) {
           console.log("!result.ok", result);
-          //window.localStorage.removeItem("setServiceLogin");
-          //window.localStorage.removeItem("usuario");
           return;
         }
-
-        // window.localStorage.setItem("usuario", JSON.stringify(result.body));
         window.localStorage.setItem(
           "createCaseBonitaFechOk",
           JSON.stringify(result.body)
@@ -177,12 +173,10 @@ function createcase(
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
     axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
-    axios
-      .get("/bonita/API/bpm/process?c=10&p=0&f=name=" + processName)
+    await axios
+      .get("" + process.env.REACT_APP_GET_PROCESSNAME + processName)
       .then((resp) => {
         let result = resp;
-        //console.log("getProcessName", resp);
-        //console.log("processId", resp.data[0].id);
         setProcessId(resp.data[0].id);
       })
       .catch((error: any) => {
@@ -218,7 +212,7 @@ function createcase(
     };
 
     console.log("----dddJSON.stringify(config)", JSON.stringify(config));
-    axios(config)
+    await axios(config)
       .then((resp) => {
         let result = resp;
         //setArchivedCaseList(result.data);
@@ -240,7 +234,8 @@ function createcase(
     console.log(" createCaseAxios processId", processId);
     const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
     console.log(X_Bonita_API_Token);
-    const BASE_URL = "/bonita/API/bpm/process/" + processId + "/instantiation";
+    const BASE_URL =
+      "" + process.env.REACT_APP_POST_CASE + +processId + "/instantiation";
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -257,7 +252,7 @@ function createcase(
     });
     //axios.defaults.data = data;
 
-    axios
+    await axios
       .post(BASE_URL, data)
       .then((resp) => {
         let result = resp;

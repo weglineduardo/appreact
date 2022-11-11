@@ -1,9 +1,5 @@
-import Moment from "moment";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
-import { kMaxLength } from "buffer";
-import { ClasesApi } from "../clases/clasesApi";
 import {
   iListCaseForClient,
   ProcessDefinitionId,
@@ -13,14 +9,28 @@ import {
 
 import { iCase } from "../interfaces/case";
 import { formatearFecha } from "../components/formatoFecha";
+import { iUsuario } from "../interfaces/usuario";
 
 function casoActivoPorNombreProceso() {
   type listCaseForClient = iListCaseForClient;
   //usamos listCaseForClient para setArchivedCaseList y
   //tambien para setCaseList por que son los mismo atributos
+  let iUarioActivo: iUsuario = {
+    copyright: "",
+    is_guest_user: "",
+    branding_version: "",
+    branding_version_with_date: "",
+    user_id: "",
+    user_name: "",
+    session_id: "",
+    conf: "",
+    is_technical_user: "",
+    version: "",
+  };
   const [archivedCaseList, setArchivedCaseList] = useState<listCaseForClient[]>(
     []
   );
+  const [usuario, setUsuario] = useState<iUsuario>(iUarioActivo);
 
   const [isVisible, setisVisible] = useState(false);
   const [inputId, setInputId] = useState<string>("1");
@@ -113,6 +123,10 @@ function casoActivoPorNombreProceso() {
     }
   }, [setisVisible]);
 
+  useEffect(() => {
+    usuarioActivo;
+  }, []);
+
   const obtenerCaseList = async (name: string) => {
     setCaseList([]);
     setisVisible(false);
@@ -122,9 +136,12 @@ function casoActivoPorNombreProceso() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
-        "/bonita/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0&s=" +
+        "" +
+          process.env.REACT_APP_LISTCASEACTIVED +
+          usuario.user_id +
+          "&n=activeFlowNodes&n=failedFlowNodes&t=0&s=" +
           name +
           "&o=startDate+DESC"
       )
@@ -146,7 +163,25 @@ function casoActivoPorNombreProceso() {
       });
     return;
   };
+  const usuarioActivo = async () => {
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    await axios
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
+      .then((resp) => {
+        let result = resp;
+        setUsuario(result.data);
+        console.log(result.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return;
+  };
   return (
     <>
       {isVisible === false ? (

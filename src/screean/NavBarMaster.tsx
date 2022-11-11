@@ -5,14 +5,8 @@ import unusedIdFetch from "../components/unusedIdFetch";
 import React, { useState, useEffect } from "react";
 
 import { iUsuario } from "../interfaces/usuario";
-import bonitaCase from "../components/bonitaCase";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
-import Accordion from "./acordion";
-import { idText } from "typescript";
-import { JsonSerializer } from "typescript-json-serializer";
-import { JsonConvert } from "json2typescript";
-
 //import "../App.css";
 
 function NavBarMaster() {
@@ -33,8 +27,6 @@ function NavBarMaster() {
   const [serviceLogin, setServiceLogin] = useState("");
   const [usuario, setUsuario] = useState<iUarioActivo>();
   const [caseList, setCaseList] = useState([]);
-  let defaultSerializer = new JsonSerializer();
-  let jsonConvert: JsonConvert = new JsonConvert();
 
   useEffect(() => {
     //console.log(caseList.forEach((c) => console.log(c)));
@@ -111,7 +103,7 @@ function NavBarMaster() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get("/bonita/logoutservice?redirect=false")
       .then((resp) => {
         //console.log("resp JSON.stringif = ", JSON.stringify(resp));
@@ -136,13 +128,11 @@ function NavBarMaster() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
-
-        let rr = jsonConvert.deserializeObject(result.data, rs);
         console.log("rr", usuario ? usuario.branding_version : "sin datos");
         /*const rr: iUsuario = result.data;
         const dataz = defaultSerializer.serialize(result.data);
@@ -186,7 +176,7 @@ function NavBarMaster() {
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
 
-    axios
+    await axios
       .get(process.env.REACT_APP_GET_CASEFORID + "4001")
       .then((resp) => {
         let result = resp;
@@ -214,7 +204,7 @@ function NavBarMaster() {
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios.defaults.withCredentials = true;
-    axios
+    await axios
       .get(
         "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
       )

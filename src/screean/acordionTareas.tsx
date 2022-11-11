@@ -1,8 +1,9 @@
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 import React from "react";
-import Lista from "./lista";
-const Accordion = () => {
+import ListaTareas from "./lista-tareas";
+
+const AccordionTarea = () => {
   return (
     <>
       <div className="col-12 row">
@@ -17,7 +18,7 @@ const Accordion = () => {
                 aria-expanded="false"
                 aria-controls="collapseOne"
               >
-                Lista de casos
+                Lista de tareas
               </button>
             </h2>
             <div
@@ -27,7 +28,7 @@ const Accordion = () => {
               data-bs-parent="#accordionExample"
             >
               <div className="accordion-body">
-                <Lista />
+                <ListaTareas />
               </div>
             </div>
           </div>
@@ -37,24 +38,4 @@ const Accordion = () => {
   );
 };
 
-export default Accordion;
-
-/*
-
-      <Children
-        title={"title"}
-        content={"content"}
-        information={information}
-        sum={funSum}
-      />
-      <button className="btn btn-succes" onClick={() => traercomponente}>
-        traer componente
-      </button>
-      
-{JSON.stringify(
-                    cases.map((user) => (
-                      <div className="user" key={user}>
-                        {user}
-                      </div>
-                    ))
-                  )} */
+export default AccordionTarea;

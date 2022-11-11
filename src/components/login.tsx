@@ -6,7 +6,6 @@ import { iUsuario } from "../interfaces/usuario";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 
-import { JsonConvert, ValueCheckingMode } from "json2typescript";
 import { UsuarioContext } from "../context/usuarioContext";
 import AlertDanger from "../screean/alertDanger";
 
@@ -36,7 +35,6 @@ function Login() {
   const [isLogin, setLogin] = useState(false);
   const [serviceLogin, setServiceLogin] = useState("");
   const [usuario, setUsuario] = useState<iUarioActivo>();
-  let jsonConvert: JsonConvert = new JsonConvert();
   //#region
 
   //#region Login
@@ -49,9 +47,9 @@ function Login() {
     console.log(visibilidad);
   };
 
-  const fetchLoginService = () => {
+  const fetchLoginService = async () => {
     //console.log(inputUsuario, inputPass);
-    loginFetch(inputUsuario, inputPass).then(() => setBredirect(true));
+    await loginFetch(inputUsuario, inputPass).then(() => setBredirect(true));
     usuarioActivo();
     setBredirect(false);
 
@@ -136,11 +134,8 @@ function Login() {
         let result = resp;
         setUsuario(result.data);
 
-        let rr = jsonConvert.deserializeObject(result.data, rs);
-        //console.log("rr", usuario ? usuario.branding_version : "sin datos");
         console.log(result.data);
         window.localStorage.setItem("usuario", JSON.stringify(result.data));
-        window.localStorage.setItem("rr", JSON.stringify(rr));
         let storrageUser = JSON.stringify(
           window.localStorage.getItem("usuario")
         );
