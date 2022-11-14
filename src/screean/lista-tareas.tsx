@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
-import { iListCaseForClient } from "../interfaces/listCaseClient";
 import { iCase } from "../interfaces/case";
 import { formatearFecha } from "../components/formatoFecha";
 import Icons from "../components/icons";
@@ -12,6 +10,7 @@ import ApiBonita from "../apis/ApiBonita";
 import { iListTackHumanUserId } from "../interfaces/listTackHumanUserId";
 import { iListTaskHumanCompleteUser } from "../interfaces/listTaskHumanCompleteUser";
 import { iListTaskHumanMyUser } from "../interfaces/listTaskHumanMyUser";
+import apiGlpi from "../apis/ApiGlpi";
 
 const ListaTareas = () => {
   let iUarioActivo: iUsuario = {
@@ -135,7 +134,6 @@ const ListaTareas = () => {
   //#region usuario activo
   const usuarioActivo = async () => {
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
@@ -154,7 +152,11 @@ const ListaTareas = () => {
   };
 
   useEffect(() => {
+    //let apiglpis = new apiGlpi();
+    //apiglpis.loginGlpi();
     usuarioActivo();
+    getTaskHumanMyUser(usuario.user_id);
+    getTaskHumanOpen(usuario.user_id);
   }, []);
   //#endregion
 
@@ -192,10 +194,6 @@ const ListaTareas = () => {
               <div className="container">
                 <div className="row shadow p-2 mb-3 bg-white rounded">
                   <div className="col-1">
-                    <div>Id </div>
-                    <div>{list.rootCaseId} </div>
-                  </div>
-                  <div className="col-1">
                     <div> Id tarea </div>
                     <div>{list.id} </div>
                   </div>
@@ -211,7 +209,7 @@ const ListaTareas = () => {
                     <div>Nombre Proceso </div>
                     <div> {list.rootContainerId.displayName}</div>
                   </div>
-                  <div className="col-2">
+                  <div className="col-3">
                     {" "}
                     <div>Ultima actualizacion</div>
                     <div>{formatearFecha(list.last_update_date)} </div>
@@ -240,67 +238,7 @@ const ListaTareas = () => {
       </div>
     </div>
   );
-  const tabTaskMes = (
-    <div className="tab-pane fade " id="tabTaskMe" role="tabpanel">
-      <div className="row">
-        <div className="column"></div>
-        <div className="column">
-          {showAlert(
-            "NO encontramos mis tareas para el cliente logueado",
-            "Estas son mis tareas"
-          )}
 
-          {listTaskHumanMyUser.map((listM) => (
-            <div className="container">
-              <div className="row shadow p-2 mb-3 bg-white rounded">
-                <div className="col-1">
-                  <div>Id </div>
-                  <div>{listM.rootCaseId} </div>
-                </div>
-                <div className="col-1">
-                  <div> Id tarea </div>
-                  <div>{listM.id} </div>
-                </div>
-                <div className="col-2">
-                  <div>Nombre tarea </div>
-                  <div> {listM.name}</div>
-                </div>
-                <div className="col-1">
-                  <div>Caso </div>
-                  <div> {listM.caseId}</div>
-                </div>
-                <div className="col-2">
-                  <div>Nombre Proceso </div>
-                  <div> {listM.rootContainerId.displayName}</div>
-                </div>
-                <div className="col-2">
-                  {" "}
-                  <div>Ultima actualizacion</div>
-                  <div>{formatearFecha(listM.last_update_date)} </div>
-                </div>
-                <div className="col-2">
-                  {" "}
-                  <div>Vencimiento</div>
-                  <div>{formatearFecha(listM.dueDate)} </div>
-                </div>
-                <div className="col-1">
-                  <div>
-                    <button
-                      onClick={() => navigateTo(listM.id)}
-                      className="btn btn-outline-info btn-sm align-text-bottom"
-                    >
-                      {" "}
-                      Ver{" "}
-                    </button>{" "}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
   const tabTaskMe = (
     <div>
       <div
@@ -321,10 +259,6 @@ const ListaTareas = () => {
               <div className="container">
                 <div className="row shadow p-2 mb-3 bg-white rounded">
                   <div className="col-1">
-                    <div>Id </div>
-                    <div>{listc.rootCaseId} </div>
-                  </div>
-                  <div className="col-1">
                     <div> Id tarea </div>
                     <div>{listc.id} </div>
                   </div>
@@ -340,7 +274,7 @@ const ListaTareas = () => {
                     <div>Nombre Proceso </div>
                     <div> {listc.rootContainerId.displayName}</div>
                   </div>
-                  <div className="col-2">
+                  <div className="col-3">
                     {" "}
                     <div>Ultima actualizacion</div>
                     <div>{formatearFecha(listc.last_update_date)} </div>
@@ -390,10 +324,6 @@ const ListaTareas = () => {
               <div className="container">
                 <div className="row shadow p-2 mb-3 bg-white rounded">
                   <div className="col-1">
-                    <div>Id </div>
-                    <div>{listc.rootCaseId} </div>
-                  </div>
-                  <div className="col-1">
                     <div> Id tarea </div>
                     <div>{listc.id} </div>
                   </div>
@@ -409,7 +339,7 @@ const ListaTareas = () => {
                     <div>Nombre Proceso </div>
                     <div> {listc.rootContainerId.displayName}</div>
                   </div>
-                  <div className="col-2">
+                  <div className="col-3">
                     {" "}
                     <div>Ultima actualizacion</div>
                     <div>{formatearFecha(listc.last_update_date)} </div>
@@ -448,7 +378,8 @@ const ListaTareas = () => {
       role="tab"
       onClick={() => getTaskHumanOpen(usuario.user_id)}
     >
-      Tareas por Hacer <Icons />
+      Tareas por Hacer {listTackHumanUserId.length}
+      {"  "} <Icons />
     </a>
   );
   const tab2 = (
@@ -460,7 +391,7 @@ const ListaTareas = () => {
       role="tab"
       onClick={() => getTaskHumanMyUser(usuario.user_id)}
     >
-      Mis tareas <Icons />
+      Mis tareas {listTaskHumanMyUser.length} <Icons />
     </a>
   );
   const tab3 = (

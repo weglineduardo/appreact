@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import AlertSuccess from "../screean/alertSuccess";
 import DateTimePicker from "./dateTimePicker";
+import apiGlpi from "../apis/ApiGlpi";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 
@@ -153,6 +154,8 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     return;
   };
 
+  const apiglpi = new apiGlpi();
+  const respo = apiglpi.loginGlpi();
   const usuarioActivo = async () => {
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";

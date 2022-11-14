@@ -15,18 +15,29 @@ import { formatearFecha } from "../components/formatoFecha";
 
 import { useLocation } from "react-router-dom";
 import ChildFormCasoDetalle from "../components/childFormCasoDetalle";
+import { iUsuario } from "../interfaces/usuario";
 
 const CasoConDetalle = () => {
+  let iUarioActivo: iUsuario = {
+    copyright: "",
+    is_guest_user: "",
+    branding_version: "",
+    branding_version_with_date: "",
+    user_id: "",
+    user_name: "",
+    session_id: "",
+    conf: "",
+    is_technical_user: "",
+    version: "",
+  };
   const query = new URLSearchParams(useLocation().search);
   let idCaso: any;
   idCaso = query.get("id") ? query.get("id") : "0";
   type listCaseForClient = iListCaseForClient;
   //usamos listCaseForClient para setArchivedCaseList y
   //tambien para setCaseList por que son los mismo atributos
-  const [archivedCaseList, setArchivedCaseList] = useState<listCaseForClient[]>(
-    []
-  );
-
+  const [cantTask, setCantTask] = useState(11);
+  const [usuario, setUsuario] = useState<iUsuario>(iUarioActivo);
   const [isVisible, setisVisible] = useState(false);
   const [inputId, setInputId] = useState<string>("1");
   const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
@@ -106,17 +117,6 @@ const CasoConDetalle = () => {
     const [caseid, setCaseid] = useState<listCaseForClient>();
   };
   const [caseid, setCaseid] = useState<listCaseForClient>(elcase);
-  useEffect(() => {
-    if (!isVisible) {
-      console.log("useLayoutEffect");
-    }
-  }, [setisVisible]);
-
-  useLayoutEffect(() => {
-    if (!isVisible) {
-      console.log("useLayoutEffect");
-    }
-  }, [setisVisible]);
 
   //#region caseForId
   const caseForId = async (id: string) => {
@@ -156,13 +156,59 @@ const CasoConDetalle = () => {
       });
     return;
   };
-
+  const usuarioActivo = async () => {
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    await axios
+      .get("" + process.env.REACT_APP_API_USERACTIVE)
+      .then((resp) => {
+        let result = resp;
+        setUsuario(result.data);
+        console.log(result.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return;
+  };
+  const getHumeanTaskUserCase = async (user_id: string, caso_id: string) => {
+    //await usuarioActivo();
+    let userId = usuario.user_id;
+    console.log({ userId });
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    await axios
+      .get(
+        "/bonita/API/bpm/humanTask?p=0&c=50&f=state=ready&f=user_id=" +
+          userId +
+          "&f=caseId=" +
+          idCaso
+      )
+      .then((resp) => {
+        setCantTask(resp.data.length);
+        console.log("result.data.length :", resp.data.length);
+        if (resp.data.length == 0) {
+          console.log("lista vacia");
+        } else {
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    return;
+  };
   //#endregion
 
   useEffect(() => {
-    console.log("  caseForId20003");
-
+    usuarioActivo();
     caseForId(idCaso);
+    getHumeanTaskUserCase(usuario.user_id, idCaso);
   }, [setisVisible]);
   return (
     <>
@@ -211,6 +257,7 @@ const CasoConDetalle = () => {
                     }
                     caseData={caseid}
                     casoId={idCaso}
+                    cantTask={cantTask}
                   />
                 </div>
               </div>

@@ -115,9 +115,40 @@ const Lista = () => {
       });
     return;
   };
+  const tareaPorCase = async (user_id: string, caso_id: string) => {
+    //await usuarioActivo();
+    let userId = usuario.user_id;
+    console.log({ userId });
+    const cookies = new Cookies();
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    await axios
+      .get(
+        "/bonita/API/bpm/humanTask?p=0&c=50&f=state=ready&f=user_id=" +
+          userId +
+          "&f=caseId=31005"
+      )
+      .then((resp) => {
+        let result = resp;
+        console.log("result.data :", result.data);
+        console.log("result.data.length :", result.data.length);
+        if (result.data.length == 0) {
+          console.log("lista vacia");
+        } else {
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    return;
+  };
   useEffect(() => {
     usuarioActivo();
+    //tareaPorCase(usuario.user_id);
   }, []);
 
   //#endregion

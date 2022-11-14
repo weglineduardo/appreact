@@ -23,6 +23,7 @@ interface Props {
   data: string;
   caseData: iListCaseForClient;
   casoId: string;
+  cantTask: number;
 }
 
 const ChildFormCasoDetalle: React.FC<Props> = ({
@@ -37,17 +38,10 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
   data,
   caseData,
   casoId,
+  cantTask,
 }) => {
-  const [caseid, setCaseid] = useState<caseId[]>([]);
-  type listCaseForClient = iListCaseForClient;
-  const [archivedCaseList, setArchivedCaseList] = useState<listCaseForClient[]>(
-    []
-  );
-
   type comment = iComment;
   const [listComments, setListComments] = useState<comment[]>([]);
-
-  const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
   //setCaseid(data);
   let [processId, setProcessId] = useState("");
   const [comments, setComments] = useState("");
@@ -60,7 +54,6 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
   const addComment = async (caseId: string, comment: string) => {
     await addCommentFetch(casoId, comment);
     await getListComment(casoId);
-    //getListComment(casoId);
   };
 
   const getComments = async (caseId: string) => {
@@ -198,7 +191,7 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
           <a
             className="nav-link active"
             data-bs-toggle="tab"
-            href="#home"
+            href="#"
             aria-selected="true"
             role="tab"
             onClick={() => getComments(casoId)}
@@ -300,12 +293,10 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
               <p className="form-label mt-1 text-start">Tareas disponibles</p>
             </div>
             <div className="col">
-              <p className="form-label mt-1 text-start"></p>
+              <p className="form-label mt-1 text-start">
+                <a href="/tareas">{cantTask}</a>
+              </p>
             </div>
-          </div>
-          <div className="d-flex col">
-            <div className="col"></div>
-            <div className="col"></div>
           </div>
         </div>
 
@@ -332,7 +323,7 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
       {tabComments}
     </div>
   );
-  //caseForId(casoId);
+
   return (
     <>
       <div>{bodyCard}</div>
