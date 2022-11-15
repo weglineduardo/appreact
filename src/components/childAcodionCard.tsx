@@ -1,11 +1,6 @@
 import React from "react";
 
-import {
-  Navigate,
-  redirect,
-  BrowserRouter,
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   idAcordion: string;

@@ -3,16 +3,17 @@ import ReactDOM from "react-dom/client";
 
 import { BrowserRouter } from "react-router-dom";
 import AppRouterV1 from "./AppRouterV1";
+import Glpi from "./glpi";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
 root.render(
-  <BrowserRouter>
-    {/*<AppRouter />*/}
+  <Glpi />
+  /*<BrowserRouter>
     <AppRouterV1 />
-  </BrowserRouter>
+  </BrowserRouter>*/
   /*<React.StrictMode>
     <App />
   </React.StrictMode>*/

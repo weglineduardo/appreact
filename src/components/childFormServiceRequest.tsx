@@ -9,6 +9,9 @@ import {
 import AlertSuccess from "../screean/alertSuccess";
 import DateTimePicker from "./dateTimePicker";
 import apiGlpi from "../apis/ApiGlpi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppStore } from "../redux/store";
+import { modifyUser } from "../redux/states/usuarioActivo.state";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 
@@ -33,6 +36,9 @@ const ChildFormServiceRequest: React.FC<Props> = ({
   routeUrl,
   style,
 }) => {
+  //const userState = useSelector((store: AppStore) => store.usuarioActivo);
+  //const dispatch = useDispatch();
+  //dispatch(modifyUser((userState.user_name = "3131331313131")));
   let [createCaseId, setCreateCaseId] = useState({});
   let [processId, setProcessId] = useState("");
   useEffect(() => {
@@ -73,7 +79,7 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     if (creado) {
       showAlert();
     }
-    setTimeout(function() {
+    setTimeout(function () {
       navigateTo("/app");
     }, 4000);
   };
@@ -154,8 +160,8 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     return;
   };
 
-  const apiglpi = new apiGlpi();
-  const respo = apiglpi.loginGlpi();
+  //const apiglpi = new apiGlpi();
+  //const respo = apiglpi.loginGlpi();
   const usuarioActivo = async () => {
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -273,8 +279,6 @@ const ChildFormServiceRequest: React.FC<Props> = ({
 
   return (
     <div>
-      {}
-
       <div className={Style}>
         <div className="card-header">{cardHeader}</div>
         <div className="card-body">

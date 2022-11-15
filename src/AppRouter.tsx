@@ -1,8 +1,6 @@
 import NavBar from "./screean/navBar";
 import React, { useState, Component } from "react";
-
 import { Route, Link } from "react-router-dom";
-
 import { Path, Routes } from "react-router";
 import "./App.css";
 import App from "./App";

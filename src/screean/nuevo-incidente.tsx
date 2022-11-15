@@ -62,7 +62,7 @@ async function createcase(
   sprocessId: string,
   setProcessId: React.Dispatch<React.SetStateAction<string>>
 ) {
-  usuarioActivo;
+  await usuarioActivo;
   console.log("sprocessId 1", sprocessId);
   await getProcessName("ServiceRequest");
 

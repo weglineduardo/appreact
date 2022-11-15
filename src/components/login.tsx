@@ -1,15 +1,30 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import axios, { AxiosResponse } from "axios";
-
 import { useNavigate } from "react-router-dom";
 import { iUsuario } from "../interfaces/usuario";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
-
 import { UsuarioContext } from "../context/usuarioContext";
 import AlertDanger from "../screean/alertDanger";
+import { AppStore } from "../redux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
+import {
+  createUser,
+  modifyUser,
+  resetUser,
+} from "../redux/states/usuarioActivo.state";
+import { loginGlpi } from "../apis/public.service";
 
 function Login() {
+  const userState = useSelector((store: AppStore) => store.usuarioActivo);
+  const dispatch = useDispatch();
+  //const {
+  //  register,
+  //  handleSubmit,
+  //  formState: { errors },
+  //} = useForm({ defaultvalues: { email: "", pass: "" } });
+
   const { user_id } = useContext(UsuarioContext);
   const [inputUsuario, setInputUsuario] = useState("");
   const [inputPass, setInputPass] = useState("");
@@ -18,18 +33,6 @@ function Login() {
   let title = React.createRef();
   let refUsuario = useRef(null);
   type iUarioActivo = iUsuario;
-  class rs {
-    "copyright": string;
-    "is_guest_user": string;
-    "branding_version": string;
-    "branding_version_with_date": string;
-    "user_id": string;
-    "user_name": string;
-    "session_id": string;
-    "conf": string;
-    "is_technical_user": string;
-    "version": string;
-  }
 
   const [bredirect, setBredirect] = useState(false);
   const [isLogin, setLogin] = useState(false);
@@ -49,8 +52,10 @@ function Login() {
 
   const fetchLoginService = async () => {
     //console.log(inputUsuario, inputPass);
-    await loginFetch(inputUsuario, inputPass).then(() => setBredirect(true));
-    usuarioActivo();
+    await loginFetchGlpi();
+    //await loginFetch(inputUsuario, inputPass).then(() => setBredirect(true));
+    //await usuarioActivo();
+
     setBredirect(false);
 
     if (!bredirect) {
@@ -94,6 +99,7 @@ function Login() {
           const thebody = JSON.stringify(result.body);
           window.localStorage.setItem("setServiceLogin", thebody);
           setServiceLogin("Login Success " + username);
+
           setShow(false);
           return;
         })
@@ -101,28 +107,55 @@ function Login() {
           window.localStorage.removeItem("setServiceLogin");
           window.localStorage.removeItem("usuario");
           console.log("error fetch ------", error);
+
           setShow(true);
           return;
         });
     }
   };
+  const loginFetchGlpi = async () => {
+    // const lglpi = await loginGlpi;
+    await glpiloginfech();
+    //console.log(lglpi);
+    //loginFechToBonita(username, password);
+    async function glpiloginfech() {
+      let myHeaders = new Headers();
+      myHeaders.append(
+        "Authorization",
+        "'user_token' Qb8ETzMRCBj8E5mV8e83mIpZnbBjssxvsZ7HCyuJ"
+      );
+      myHeaders.append("App-Token", "JPgp2P6F38ZyWbjM1u8OyCEtXCd8Fj8Cl5KWhtiA");
+      const RequestInit: RequestInit = {
+        method: "GET",
+        headers: {
+          Authorization:
+            "'user_token' Qb8ETzMRCBj8E5mV8e83mIpZnbBjssxvsZ7HCyuJ",
+          "App-Token": "JPgp2P6F38ZyWbjM1u8OyCEtXCd8Fj8Cl5KWhtiA",
+          Connection: "keep-alive",
+          "Accept-Encoding": "gzip, deflate, br",
+          Accept: "*/*",
+          "User-Agent": "PostmanRuntime/7.29.0",
+          Host: "<calculated when request is sent>",
+        },
+        redirect: "follow",
+      };
+      RequestInit.method = "GET";
+      console.log(JSON.stringify(RequestInit.headers));
+      //console.log(JSON.stringify(RequestInit));
+
+      await fetch(
+        "https://glpi.apps.synchro.com.ar/apirest.php/initSession",
+        RequestInit
+      )
+        .then((response) => response.text())
+        .then((result) => console.log("result :", result))
+        .catch((error) => console.log("error  :", error));
+    }
+  };
   //#endregion
   //#region usuario activo
   const usuarioActivo = async () => {
-    class usuarioActivo {
-      "copyright": string;
-      "is_guest_user": string;
-      "branding_version": string;
-      "branding_version_with_date": string;
-      "user_id": string;
-      "user_name": string;
-      "session_id": string;
-      "conf": string;
-      "is_technical_user": string;
-      "version": string;
-    }
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
     axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
@@ -131,17 +164,14 @@ function Login() {
     await axios
       .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
-        let result = resp;
-        setUsuario(result.data);
-
-        console.log(result.data);
-        window.localStorage.setItem("usuario", JSON.stringify(result.data));
-        let storrageUser = JSON.stringify(
-          window.localStorage.getItem("usuario")
-        );
+        setUsuario(resp.data);
+        dispatch(createUser(resp.data));
+        dispatch(modifyUser(resp.data));
+        console.log("usuarioActivo:: ", userState);
+        window.localStorage.setItem("usuario", JSON.stringify(resp.data));
       })
       .catch((error) => {
-        //window.localStorage.removeItem("usuario");
+        dispatch(resetUser());
         console.log(error);
       });
     return;

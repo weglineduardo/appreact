@@ -147,10 +147,6 @@ function App() {
       <div className="App">
         <NavBar />
         <Accordion />
-        <header className="App-header">
-          {/*<img src={logo} className="App-logo" alt="logo" />
-         <Accordion key={"hero.id"} />*/}
-        </header>
       </div>
     </>
   );
