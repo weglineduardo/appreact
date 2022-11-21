@@ -5,7 +5,35 @@ import { iUsuario } from "../../interfaces/usuario";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 
-export const usuarioActivo5 = async (): Promise<AxiosResponse<Response>> => {
+export const BonitaGetProcessName = async (processName: string) => {
+  let [processId, setProcessId] = useState("");
+  if (processName != "") {
+    let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
+    await axios
+      .get("" + process.env.REACT_APP_GET_PROCESSNAME + processName)
+      .then((resp) => {
+        setProcessId(resp.data[0].id);
+        return processId;
+      })
+      .catch((error: any) => {
+        console.log(error);
+        return processId;
+      });
+    return processId;
+  } else {
+    return processId;
+  }
+};
+export const BonitaUsuarioActivo = async (): Promise<
+  AxiosResponse<Response>
+> => {
   //type iUarioActivo = iUsuario;
   //const [usuario, setUsuario] = useState<iUarioActivo>();
   console.log("usuarioActivo5 ");
@@ -92,14 +120,14 @@ export const loginFetch5 = async (
   return await axios.get<Response>("" + process.env.REACT_APP_API_LOGINSERVICE);
 };
 
-export const loginAxios6 = async (username: string, password: string) => {
+export const BonitaLoginAxios = async (username: string, password: string) => {
   let axiosstatus = false;
   axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
   axios.defaults.headers.post["Content-Type"] =
     "application/json;charset=utf-8";
   axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
   axios.defaults.withCredentials = true;
-  console.log("loginAxios6 103");
+  console.log("BonitaLoginAxios 103");
 
   await axios
     .get(
@@ -112,8 +140,11 @@ export const loginAxios6 = async (username: string, password: string) => {
         "&redirect=false"
     )
     .then((resp) => {
-      console.log("loginAxios6 116");
-      window.localStorage.setItem("loginAxios6", JSON.stringify(resp.status));
+      console.log("BonitaLoginAxios 116");
+      window.localStorage.setItem(
+        "BonitaLoginAxios",
+        JSON.stringify(resp.status)
+      );
       let status = JSON.stringify(resp.status);
       console.log({ status });
       console.log(JSON.stringify(resp));
@@ -123,8 +154,8 @@ export const loginAxios6 = async (username: string, password: string) => {
       //axiosstatus = false;
     })
     .catch((error) => {
-      console.log("loginAxios6 123");
-      window.localStorage.removeItem("loginAxios6");
+      console.log("BonitaLoginAxios 123");
+      window.localStorage.removeItem("BonitaLoginAxios");
       console.log(error);
       axiosstatus = false;
     });
@@ -132,41 +163,6 @@ export const loginAxios6 = async (username: string, password: string) => {
 };
 
 ///////////////
-export const loginAxios7 = async (
-  username: string,
-  password: string
-): Promise<AxiosResponse<Response>> => {
-  axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-  axios.defaults.headers.post["Content-Type"] =
-    "application/json;charset=utf-8";
-  axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-  axios.defaults.withCredentials = true;
-  console.log("loginAxios6 103");
-
-  await axios
-    .get(
-      "" +
-        process.env.REACT_APP_API_LOGINSERVICE +
-        "?username=" +
-        username +
-        "&password=" +
-        password +
-        "&redirect=true"
-    )
-    .then((resp) => {
-      console.log("loginAxios6 116");
-      window.localStorage.setItem("loginAxios6", JSON.stringify(resp.status));
-      return;
-    })
-    .catch((error) => {
-      console.log("loginAxios6 123");
-      window.localStorage.removeItem("loginAxios6");
-      console.log(error);
-      return;
-    });
-  console.log("loginAxios6 130");
-  return await axios.get<Response>("" + process.env.REACT_APP_API_LOGINSERVICE);
-};
 const loginFetch = async (username: string, password: string) => {
   loginFechToBonita(username, password);
 

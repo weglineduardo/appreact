@@ -36,9 +36,6 @@ const ChildFormServiceRequest: React.FC<Props> = ({
   routeUrl,
   style,
 }) => {
-  //const userState = useSelector((store: AppStore) => store.usuarioActivo);
-  //const dispatch = useDispatch();
-  //dispatch(modifyUser((userState.user_name = "3131331313131")));
   let [createCaseId, setCreateCaseId] = useState({});
   let [processId, setProcessId] = useState("");
   useEffect(() => {

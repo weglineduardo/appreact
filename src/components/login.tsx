@@ -29,9 +29,8 @@ import {
 import { persistSessionToken } from "../apis/glpi/persist.data.service";
 import { AxiosResponse } from "axios";
 import {
-  loginAxios6,
-  loginFetch5,
-  usuarioActivo5,
+  BonitaLoginAxios,
+  BonitaUsuarioActivo,
 } from "../apis/bonita/ApiBonita";
 import { managenUsuarioState } from "../apis/bonita/persist.data.service";
 
@@ -76,75 +75,28 @@ function Login() {
   };
 
   const fetchLoginService = async () => {
-    let loginAxios6s = await loginAxios6(inputUsuario, inputPass);
-    console.log({ bredirect }, { loginAxios6s });
-    if (loginAxios6s) {
-      const useractive5 = await usuarioActivo5();
-      if (useractive5.status === 200) {
-        console.log({ useractive5 });
-        console.log({ loginAxios6s });
-        await dispatch(createUser(useractive5.data));
-        await managenUsuarioState(useractive5.data);
+    setShow(false);
+    let bonitaLoginAxios = await BonitaLoginAxios(inputUsuario, inputPass);
+    console.log({ bredirect }, { bonitaLoginAxios });
+    if (bonitaLoginAxios) {
+      const bonitaUsuarioActivo = await BonitaUsuarioActivo();
+      if (bonitaUsuarioActivo.status === 200) {
+        console.log({ bonitaLoginAxios });
+        await dispatch(createUser(bonitaUsuarioActivo.data));
+        await managenUsuarioState(bonitaUsuarioActivo.data);
       } else {
-        console.log({ loginAxios6s });
-        loginAxios6s = false;
+        console.log({ bonitaLoginAxios });
+        bonitaLoginAxios = false;
       }
     }
 
-    if (loginAxios6s) {
+    if (bonitaLoginAxios) {
       return navigateTo("home");
+    } else {
+      setShow(true);
     }
   };
 
-  const loginFetch = async (username: string, password: string) => {
-    loginFechToBonita(username, password);
-
-    async function loginFechToBonita(username: string, password: string) {
-      const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-      let urlapi = process.env.REACT_APP_API_LOGINSERVICE;
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-      var urlencoded = new URLSearchParams();
-      urlencoded.append("username", username);
-      urlencoded.append("password", password);
-      urlencoded.append("redirect", "false");
-
-      const RequestInit: RequestInit = {
-        method: "POST",
-        headers: myHeaders,
-        body: urlencoded,
-        redirect: "follow",
-        credentials: "include",
-      };
-      RequestInit.method = "POST";
-
-      await fetch(BASE_URL + "" + urlapi, RequestInit)
-        .then((result) => {
-          if (!result.ok) {
-            window.localStorage.removeItem("setServiceLogin");
-            window.localStorage.removeItem("usuario");
-            setServiceLogin("Error de Login");
-            setShow(true);
-            return;
-          }
-
-          const thebody = JSON.stringify(result.body);
-          window.localStorage.setItem("setServiceLogin", thebody);
-          setServiceLogin("Login Success " + username);
-          setShow(false);
-          return;
-        })
-        .catch((error) => {
-          window.localStorage.removeItem("setServiceLogin");
-          window.localStorage.removeItem("usuario");
-          console.log("error fetch ------", error);
-
-          setShow(true);
-          return;
-        });
-    }
-  };
   const loginFetchGlpi = async () => {
     // const lglpi = await loginGlpi;
     await glpiloginfech();
@@ -200,28 +152,7 @@ function Login() {
     }
   };
   //#endregion
-  //#region usuario activo
-  const usuarioActivo = async () => {
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
 
-    await axios
-      .get("" + process.env.REACT_APP_API_USERACTIVE)
-      .then((resp) => {
-        setUsuario(resp.data);
-        dispatch(createUser(resp.data));
-        console.log("usuarioActivo:: ", userState);
-        window.localStorage.setItem("usuario", JSON.stringify(resp.data));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  };
-  //#endregion
   const showAlert = (msjAlert: string, msj: string) => {
     if (show) {
       return <AlertDanger msj={msjAlert} />;
@@ -279,13 +210,12 @@ function Login() {
 
                         <div className="form-group ">
                           <h4 className="card-title"></h4>
-                          <a
+                          <button
                             className="btn btn-succes"
                             onClick={fetchLoginService}
-                            href="#"
                           >
                             Ingresar
-                          </a>
+                          </button>
 
                           {/*<button
                             className="btn btn-succes"
