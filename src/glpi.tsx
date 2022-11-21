@@ -1,7 +1,41 @@
+import Header from "./components/header";
+//const GlpiApi = require("glpi-api");
+const { GlpiClient } = require("glpi-client");
+const config = {
+  app_token: "JPgp2P6F38ZyWbjM1u8OyCEtXCd8Fj8Cl5KWhtiA",
+  apiurl: "https://glpi.apps.synchro.com.ar/apirest.php/initSession",
+  user_token: "Qb8ETzMRCBj8E5mV8e83mIpZnbBjssxvsZ7HCyuJ",
+};
+
+// or
+
+// Config with basic auth
+const config1 = {
+  app_token: "JPgp2P6F38ZyWbjM1u8OyCEtXCd8Fj8Cl5KWhtiA",
+  apiurl: "https://glpi.apps.synchro.com.ar/apirest.php/initSession",
+  auth: {
+    username: "glpi",
+    password: "secret",
+  },
+};
+
 const Glpi = () => {
   const loginFetchGlpi = async () => {
+    const client = new GlpiClient(
+      "https://glpi.apps.synchro.com.ar/apirest.php/initSession"
+    );
+    console.log({ client });
+    // With User Token
+    const api = await client.initSession({
+      appToken: "JPgp2P6F38ZyWbjM1u8OyCEtXCd8Fj8Cl5KWhtiA",
+      userToken: "Qb8ETzMRCBj8E5mV8e83mIpZnbBjssxvsZ7HCyuJ",
+      mode: "no-cors",
+    });
     // const lglpi = await loginGlpi;
-    await glpiloginfech();
+    //const glpi = new GlpiApi(config);
+    //await glpi.initSession();
+
+    //await glpiloginfech();
     //console.log(lglpi);
     //loginFechToBonita(username, password);
     async function glpiloginfech() {

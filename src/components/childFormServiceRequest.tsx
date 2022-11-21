@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import AlertSuccess from "../screean/alertSuccess";
 import DateTimePicker from "./dateTimePicker";
-import apiGlpi from "../apis/ApiGlpi";
+import apiGlpi from "../apis/glpi/ApiGlpi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppStore } from "../redux/store";
 import { modifyUser } from "../redux/states/usuarioActivo.state";

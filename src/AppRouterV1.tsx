@@ -22,8 +22,8 @@ export default function AppRouterV1() {
   const [valuteToshare, setValuteToshare] = useState("valuteToshare 1");
 
   return (
-    <AppContext.Provider value={valuteToshare}>
-      <Provider store={store}>
+    <Provider store={store}>
+      <AppContext.Provider value={valuteToshare}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
@@ -118,7 +118,7 @@ export default function AppRouterV1() {
             errorElement={<ErrorPage />}
           />
         </Routes>
-      </Provider>
-    </AppContext.Provider>
+      </AppContext.Provider>
+    </Provider>
   );
 }

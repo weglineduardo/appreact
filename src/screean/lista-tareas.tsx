@@ -6,11 +6,11 @@ import { formatearFecha } from "../components/formatoFecha";
 import Icons from "../components/icons";
 import AlertDanger from "./alertDanger";
 import { iUsuario } from "../interfaces/usuario";
-import ApiBonita from "../apis/ApiBonita";
+import ApiBonita from "../apis/bonita/ApiBonita";
 import { iListTackHumanUserId } from "../interfaces/listTackHumanUserId";
 import { iListTaskHumanCompleteUser } from "../interfaces/listTaskHumanCompleteUser";
 import { iListTaskHumanMyUser } from "../interfaces/listTaskHumanMyUser";
-import apiGlpi from "../apis/ApiGlpi";
+import apiGlpi from "../apis/glpi/ApiGlpi";
 
 const ListaTareas = () => {
   let iUarioActivo: iUsuario = {

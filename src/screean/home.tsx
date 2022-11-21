@@ -1,21 +1,15 @@
 import React, { useState, useContext } from "react";
 import AcordionCards from "../components/acordionCards";
-
-import Cookies from "universal-cookie";
 import NavBar from "./navBar";
-import axios from "axios";
 import { AppContext } from "../AppRouterV1";
 import { useSelector } from "react-redux";
 import { AppStore } from "../redux/store";
-import { StartedBy } from "../interfaces/archivedCase";
-const { Cookies: kks } = require("react-cookie");
-const cok = new kks();
 
 const Home = () => {
   const valorFronContex = React.useContext(AppContext);
-  let [processId, setProcessId] = useState("");
-
-  const userState = useSelector((store: AppStore) => store.usuarioActivo);
+  //const usuario = window.localStorage.getItem("usuario");
+  //const userName = usuario?.split(",")[5].split(":")[1];
+  //console.log("usuario", usuario?.split(",")[5].split(":")[1]);
 
   const loginFetchGlpi = async (username: string, password: string) => {
     // const lglpi = await loginGlpi;
@@ -63,7 +57,7 @@ const Home = () => {
       <div className="App">
         <NavBar />
         <AcordionCards />
-        <button onClick={() => loginFetchGlpi}>glpi</button>
+        {/*<button onClick={() => loginFetchGlpi}>glpi</button>*/}
       </div>
     </>
   );

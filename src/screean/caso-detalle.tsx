@@ -6,7 +6,7 @@ import ChildFormCasoDetalle from "../components/childFormCasoDetalle";
 import { iCase } from "../interfaces/case";
 import { iListCaseForClient } from "../interfaces/listCaseClient";
 import CasoConDetalle from "./casoConDetalle";
-import apiBonita from "../apis/ApiBonita";
+import apiBonita from "../apis/bonita/ApiBonita";
 import { iUsuario } from "../interfaces/usuario";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();

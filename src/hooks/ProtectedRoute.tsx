@@ -4,6 +4,8 @@ import { Navigate } from "react-router-dom";
 import { iUsuario } from "../interfaces/usuario";
 import { createUser, resetUser } from "../redux/states/usuarioActivo.state";
 import { AppStore } from "../redux/store";
+import { usuario } from "../context/usuarioContext";
+import { createSessionToken } from "../redux/states/sessionTokenGlpi.state";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 
@@ -51,25 +53,32 @@ export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 //function useAuth(): { user: iUsuario } {
 function useAuth(): { user: boolean } {
   const userState = useSelector((store: AppStore) => store.usuarioActivo);
+  //console.log("useAuth():", JSON.stringify(userState));
   const dispatch = useDispatch();
   const usuario = window.localStorage.getItem("usuario")
     ? window.localStorage.getItem("usuario")
     : "";
-
+  const glpiSssion_token = window.localStorage.getItem("glpiSssion_token")
+    ? window.localStorage.getItem("glpiSssion_token")
+    : "";
+  //if (!usuario || !glpiSssion_token) {
   if (!usuario) {
-    console.log("!usuario ::");
-    dispatch(resetUser());
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    //dispatch(createUser(JSON.stringify(usuario)));
+    //dispatch(resetUser());
     return { user: false };
   } else {
     try {
+      //console.log(JSON.stringify(usuario));
       dispatch(createUser(usuario));
+      dispatch(createSessionToken(glpiSssion_token));
     } catch (error) {
       console.log("error : ", error);
     }
 
     //dispatch(createUser(usuario));
-    console.log("dispatch(createUser(usuario)):", usuario);
-    console.log("userState :", userState);
+    //console.log("dispatch(createUser(usuario)):", usuario);
+    //console.log("userState :", userState);
     return { user: true };
   }
 }

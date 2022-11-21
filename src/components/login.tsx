@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import axios, { AxiosResponse } from "axios";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 import { iUsuario } from "../interfaces/usuario";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
 import { UsuarioContext } from "../context/usuarioContext";
 import AlertDanger from "../screean/alertDanger";
-import { AppStore } from "../redux/store";
+import store, { AppStore } from "../redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import {
@@ -14,10 +14,33 @@ import {
   modifyUser,
   resetUser,
 } from "../redux/states/usuarioActivo.state";
-import { loginGlpi } from "../apis/public.service";
+import {
+  Glpi_Login,
+  Glpi_LogOut,
+  Glpi_GetTicket,
+  Glpi_GetMyEnties,
+  Glpi_Login2,
+} from "../apis/glpi/public.service";
+import { UseLocalStorage } from "../auth/useLocalStorage";
+import {
+  createSessionToken,
+  resetSessionToken,
+} from "../redux/states/sessionTokenGlpi.state";
+import { persistSessionToken } from "../apis/glpi/persist.data.service";
+import { AxiosResponse } from "axios";
+import {
+  loginAxios6,
+  loginFetch5,
+  usuarioActivo5,
+} from "../apis/bonita/ApiBonita";
+import { managenUsuarioState } from "../apis/bonita/persist.data.service";
 
 function Login() {
   const userState = useSelector((store: AppStore) => store.usuarioActivo);
+
+  const sessionTokenGlpiSliceState = useSelector(
+    (store: AppStore) => store.sessionTokenGlpiSlice
+  );
   const dispatch = useDispatch();
   //const {
   //  register,
@@ -29,6 +52,7 @@ function Login() {
   const [inputUsuario, setInputUsuario] = useState("");
   const [inputPass, setInputPass] = useState("");
   const [show, setShow] = useState(false);
+  const [glpiSssion_token, SetGlpiSssion_token] = useState({});
 
   let title = React.createRef();
   let refUsuario = useRef(null);
@@ -38,6 +62,8 @@ function Login() {
   const [isLogin, setLogin] = useState(false);
   const [serviceLogin, setServiceLogin] = useState("");
   const [usuario, setUsuario] = useState<iUarioActivo>();
+
+  const [initSession, SetInitSession] = useState("");
   //#region
 
   //#region Login
@@ -46,19 +72,26 @@ function Login() {
     event.preventDefault();
     console.log(visibilidad);
     setVisibilidad(!visibilidad);
-
     console.log(visibilidad);
   };
 
   const fetchLoginService = async () => {
-    //console.log(inputUsuario, inputPass);
-    await loginFetchGlpi();
-    //await loginFetch(inputUsuario, inputPass).then(() => setBredirect(true));
-    //await usuarioActivo();
+    let loginAxios6s = await loginAxios6(inputUsuario, inputPass);
+    console.log({ bredirect }, { loginAxios6s });
+    if (loginAxios6s) {
+      const useractive5 = await usuarioActivo5();
+      if (useractive5.status === 200) {
+        console.log({ useractive5 });
+        console.log({ loginAxios6s });
+        await dispatch(createUser(useractive5.data));
+        await managenUsuarioState(useractive5.data);
+      } else {
+        console.log({ loginAxios6s });
+        loginAxios6s = false;
+      }
+    }
 
-    setBredirect(false);
-
-    if (!bredirect) {
+    if (loginAxios6s) {
       return navigateTo("home");
     }
   };
@@ -99,7 +132,6 @@ function Login() {
           const thebody = JSON.stringify(result.body);
           window.localStorage.setItem("setServiceLogin", thebody);
           setServiceLogin("Login Success " + username);
-
           setShow(false);
           return;
         })
@@ -119,6 +151,8 @@ function Login() {
     //console.log(lglpi);
     //loginFechToBonita(username, password);
     async function glpiloginfech() {
+      const appToken = process.env.REACT_APP_GLPI_TOKEN;
+      const authorization = process.env.REACT_APP_GLPI_AUTHORIZATION;
       let myHeaders = new Headers();
       myHeaders.append(
         "Authorization",
@@ -142,14 +176,27 @@ function Login() {
       RequestInit.method = "GET";
       console.log(JSON.stringify(RequestInit.headers));
       //console.log(JSON.stringify(RequestInit));
-
+      //"https://glpi.apps.synchro.com.ar/apirest.php/initSession",
       await fetch(
-        "https://glpi.apps.synchro.com.ar/apirest.php/initSession",
+        "" +
+          process.env.REACT_APP_BASE_URL_API_GLPI +
+          process.env.REACT_APP_GLPI_LOGIN,
+
         RequestInit
       )
         .then((response) => response.text())
-        .then((result) => console.log("result :", result))
-        .catch((error) => console.log("error  :", error));
+        .then((result) => {
+          console.log("result :", result);
+          SetInitSession(result);
+          dispatch(createSessionToken(result));
+          console.log("SetInitSession:: ", initSession);
+          window.localStorage.setItem("initSession", JSON.stringify(result));
+        })
+        .catch((error) => {
+          console.log("error:: ", error);
+          dispatch(resetSessionToken());
+          window.localStorage.removeItem("initSession");
+        });
     }
   };
   //#endregion
@@ -166,12 +213,10 @@ function Login() {
       .then((resp) => {
         setUsuario(resp.data);
         dispatch(createUser(resp.data));
-        dispatch(modifyUser(resp.data));
         console.log("usuarioActivo:: ", userState);
         window.localStorage.setItem("usuario", JSON.stringify(resp.data));
       })
       .catch((error) => {
-        dispatch(resetUser());
         console.log(error);
       });
     return;
@@ -234,12 +279,13 @@ function Login() {
 
                         <div className="form-group ">
                           <h4 className="card-title"></h4>
-                          <button
+                          <a
                             className="btn btn-succes"
                             onClick={fetchLoginService}
+                            href="#"
                           >
                             Ingresar
-                          </button>
+                          </a>
 
                           {/*<button
                             className="btn btn-succes"

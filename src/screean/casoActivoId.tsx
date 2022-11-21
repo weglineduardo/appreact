@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
   Navigate,
   redirect,
@@ -155,15 +156,16 @@ function casoActivoId() {
       })
       .catch((error: any) => {
         console.log(error);
-        LimpiarUseState;
+        LimpiarUseState();
         setisVisible(false);
         return;
       });
     return;
   };
   const navigate = useNavigate();
+
   const navigateTo = (routeUrl: string) => {
-    const url = `/caso-detalle/?id=${routeUrl}`;
+    const url = `/${routeUrl}`;
     navigate(url);
   };
   //#endregion

@@ -1,49 +1,44 @@
-import Cookies from "universal-cookie";
 import axios, { AxiosResponse } from "axios";
 import React, { useState, useEffect } from "react";
 
 import { iUsuario } from "../interfaces/usuario";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
 import "bootswatch/dist/js/bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { AppStore } from "../redux/store";
+import { createUser, resetUser } from "../redux/states/usuarioActivo.state";
 
 //import "../App.css";
 
 function NavBar() {
-  type iUarioActivo = iUsuario;
-  class rs {
-    "copyright": string;
-    "is_guest_user": string;
-    "branding_version": string;
-    "branding_version_with_date": string;
-    "user_id": string;
-    "user_name": string;
-    "session_id": string;
-    "conf": string;
-    "is_technical_user": string;
-    "version": string;
-  }
+  const localStorageUsuario = window.localStorage.getItem("usuario");
+  const userName = localStorageUsuario?.split(",")[5].split(":")[1];
 
+  const userState = useSelector((store: AppStore) => store.usuarioActivo);
+  const dispatch = useDispatch();
+  type iUarioActivo = iUsuario;
   const [serviceLogin, setServiceLogin] = useState("");
-  const [usuario, setUsuario] = useState<iUarioActivo>();
+  let [usuario, setUsuario] = useState<iUarioActivo>();
   const [caseList, setCaseList] = useState([]);
 
-  useEffect(() => {
-    //console.log(caseList.forEach((c) => console.log(c)));
-  }, [caseList]);
-  useEffect(() => {
-    usuarioActivo;
-  }, [serviceLogin, usuario]);
   //#region Login
   const fetchLoginService = async () => {
     loginFetch("walter.bates", "bpm");
     usuarioActivo();
+    //      window.localStorage.setItem("usuario", JSON.stringify(resp.data));
+
+    const localStorageUsuario = window.localStorage.getItem("usuario");
+    console.log({ localStorageUsuario });
+    await dispatch(createUser(usuario));
+    //dispatch(createUser(JSON.stringify(localStorageUsuario)));
+
+    //console.log({ userState });
+    //console.log(userState);
+    //setServiceLogin("Login Success " + { localStorageUsuario });
   };
 
   const loginFetch = async (username: string, password: string) => {
     loginFechToBonita(username, password);
-
-    const BASE_URL = process.env.REACT_APP_BASE_URL_API;
-
     async function loginFechToBonita(username: string, password: string) {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -73,18 +68,16 @@ function NavBar() {
             setServiceLogin("Error de Login");
             throw Error(result.status.toString());
           }
-          /*result.json().then((json) => {
-            console.log("result.body jsom = ", json);
-          });*/
-          setServiceLogin("Login Success " + username);
 
           console.log(result);
-          return result;
+          //return result;
         })
         .catch((error) => {
           console.log("error fetch", error);
-          return error;
+          //return error;
         });
+
+      return;
     }
   };
   //#endregion
@@ -118,6 +111,8 @@ function NavBar() {
         setServiceLogin(error);
         console.log(error);
       });
+
+    dispatch(resetUser());
   };
 
   //#endregion
@@ -133,116 +128,33 @@ function NavBar() {
     await axios
       .get("" + process.env.REACT_APP_API_USERACTIVE)
       .then((resp) => {
-        let result = resp;
-        setUsuario(result.data);
-        console.log(
-          "usuario.user_id",
-          usuario ? usuario.user_id : "sin usuario.user_id"
-        );
-        setServiceLogin(
-          "Login Success " + (usuario ? usuario.user_name : "sin datos")
-        );
+        setUsuario(resp.data);
+        //dispatch(createUser(JSON.stringify(usuario)));
 
-        console.log(result.data);
+        //console.log("usuario usuario :", usuario);
+        setServiceLogin("Login Success " + usuario?.user_name);
+
+        console.log(resp.data);
       })
       .catch((error) => {
+        setServiceLogin("Login No Success");
         console.log(error);
       });
+
+    await dispatch(createUser(usuario));
+    // await dispatch(createUser(usuario));
     return;
   };
+  useEffect(() => {
+    usuarioActivo();
+  }, []);
   //#endregion
 
   //#region case
-  const getCase = async () => {
-    obtenerCase();
-  };
-  const obtenerCase = async () => {
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-
-    await axios
-      .get(process.env.REACT_APP_GET_CASEFORID + "4001")
-      .then((resp) => {
-        let result = resp;
-        console.log(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    return;
-  };
   //#endregion
 
   //#region case-list
-  const getCaseList = async () => {
-    obtenerCaseList();
-    //obtenercomment();
-  };
-  const obtenerCaseList = async () => {
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    await axios
-      .get(
-        "/bonita/portal/resource/app/userAppBonita/case-list/API/bpm/case?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&n=activeFlowNodes&n=failedFlowNodes&t=0"
-      )
-      .then((resp) => {
-        let result = resp;
-        setCaseList(result.data);
-        console.log(result.data);
-        console.log(caseList.forEach((c) => console.log(c)));
-
-        console.log(result.data[0]);
-        const esta =
-          result &&
-          result.data &&
-          result.data.map((element: any, index: any) => {
-            console.log("result.data", element);
-            console.log(
-              "result.data.json.stringfy",
-              JSON.stringify(element, null, "---")
-            );
-          });
-
-        // here you should see your data })
-        /* const inp = async () => {
-          await console.log(caseList.forEach((c) => console.log(c)));
-        };*/
-
-        /*setCaseList(result.data);
-        console.log(" caseList ---", caseList);
-        setCaseList(result.data);
-        const data_array = caseList;
-        caseList.find((item) => item. === id);
-        caseList.filter((hero) => hero.publisher === publisher)
-        console.log(setCaseList);*/
-        //console.log(data_array[0]);
-        /*console.log(data_array[1].split(":")[1].split(","));
-        const { never } = caseList;
-        const { Detalles } = never[0];
-        const { Descripcion } = caseList[0].split(":")[1].split(",");*/
-        //const todoItems = caseList.map(());
-        // const[...]=caseList;
-        //console.log(" caseList[0] ---", caseList[0]);
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
-    return;
-  };
 
   //#endregion
 
@@ -439,7 +351,7 @@ function NavBar() {
                   </a>
                 </div>
               </li>
-              <li className="nav-item" onClick={usuarioActivo}>
+              <li className="nav-item" onClick={() => usuarioActivo()}>
                 <a className="nav-link" href="#">
                   Usuario activo
                 </a>
@@ -467,7 +379,7 @@ function NavBar() {
               </li>
 
               <h6 className="text-succes">
-                {serviceLogin}
+                {userName}
                 {/* {JSON.stringify(usuario ? usuario.user_name : " ")}*/}
               </h6>
             </ul>

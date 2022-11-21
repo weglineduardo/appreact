@@ -106,8 +106,11 @@ const ChildFormIncidente: React.FC<Props> = ({
     RequestInit.method = "POST";
 
     const BASE_URL =
-      "" + process.env.REACT_APP_BASE_URL_API + process.env.REACT_APP_POST_CASE;
-    +processId + "/instantiation";
+      "" +
+      process.env.REACT_APP_BASE_URL_API +
+      process.env.REACT_APP_POST_CASE +
+      processId +
+      "/instantiation";
     console.log("RequestInit", RequestInit);
 
     await fetch(BASE_URL, RequestInit)

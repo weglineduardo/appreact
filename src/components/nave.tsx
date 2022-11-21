@@ -124,7 +124,7 @@ const ButtonComponent = () => {
 
         console.log("rr", usuario ? usuario.branding_version : "sin datos");
         console.log(result.data);
-        handleClick;
+        //handleClick;
       })
       .catch((error) => {
         console.log(error);
