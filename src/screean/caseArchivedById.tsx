@@ -1,8 +1,7 @@
 //import "./App.css";
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import NavBar from "./navBar";
-import ListaCasosActivos from "./casoActivoId";
 import CasoArchivadoId from "./casoArchivadoId";
 
 function CaseArchivedById() {

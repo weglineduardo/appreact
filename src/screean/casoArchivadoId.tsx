@@ -9,6 +9,8 @@ import {
   StartedBy,
   StartedBySubstitute,
 } from "../interfaces/archivedCase";
+import { BonitaUsuarioActivo } from "../apis/bonita/ApiBonita";
+import { iUsuario } from "../interfaces/usuario";
 
 function CasoArchivadoId() {
   type archivedCase = iArchivedCase;
@@ -82,9 +84,21 @@ function CasoArchivadoId() {
     searchIndex4Label: "",
     last_update_date: "",
   };
-
+  let iUarioActivo: iUsuario = {
+    copyright: "",
+    is_guest_user: "",
+    branding_version: "",
+    branding_version_with_date: "",
+    user_id: "",
+    user_name: "",
+    session_id: "",
+    conf: "",
+    is_technical_user: "",
+    version: "",
+  };
   const [isVisible, setisVisible] = useState(false);
   const [inputId, setInputId] = useState<string>("1");
+  const [usuario, setUsuario] = useState<iUsuario>(iUarioActivo);
 
   const [archivedCaseid, setArchivedCaseid] =
     useState<archivedCase>(iarchivedCaseid);
@@ -93,10 +107,8 @@ function CasoArchivadoId() {
       useState<archivedCase>(iarchivedCaseid);
   };
   useEffect(() => {
-    if (!isVisible) {
-      console.log("useLayoutEffect");
-    }
-  }, [setisVisible]);
+    usuarioActivo();
+  }, []);
 
   useLayoutEffect(() => {
     if (!isVisible) {
@@ -104,6 +116,18 @@ function CasoArchivadoId() {
     }
   }, [setisVisible]);
 
+  const usuarioActivo = async () => {
+    await BonitaUsuarioActivo()
+      .then((resp) => {
+        let result = resp;
+        setUsuario(result.data);
+        console.log(result.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return;
+  };
   //#region caseForId
   const caseForId = async (id: string) => {
     //setArchivedCaseid();
@@ -142,7 +166,7 @@ function CasoArchivadoId() {
       })
       .catch((error: any) => {
         console.log(error);
-        LimpiarUseState;
+        //LimpiarUseState;
         setisVisible(false);
 
         return;

@@ -13,6 +13,9 @@ import {
 
 import { iCase } from "../interfaces/case";
 import { formatearFecha } from "../components/formatoFecha";
+import { BonitaGetCaseArchivedByProcessNameList } from "../apis/bonita/ApiBonita";
+import { useSelector } from "react-redux";
+import { AppStore } from "../redux/store";
 
 function CasoArchivadoPorNombreProceso() {
   type listCaseForClient = iListCaseForClient;
@@ -96,7 +99,14 @@ function CasoArchivadoPorNombreProceso() {
     started_by: startedBy,
     processDefinitionId: processDefinitionId,
   };
-
+  const SelectorUsuarioActivo = useSelector(
+    (store: AppStore) => store.usuarioActivo
+  );
+  const user = JSON.parse(JSON.stringify(SelectorUsuarioActivo));
+  console.log("SelectorUsuarioActivo dss user_id", user.user_id);
+  console.log("SelectorUsuarioActivo dss user", user.user_name);
+  let userid = user.user_id;
+  console.log({ userid: userid });
   const LimpiarUseState = () => {
     const [caseList, setCaseList] = useState<listCaseForClient>(elcase);
   };
@@ -113,10 +123,29 @@ function CasoArchivadoPorNombreProceso() {
     }
   }, [setisVisible]);
 
-  const obtenerCaseList = async (name: string) => {
+  const obtenerCaseList = async (user_id: string, process_name: string) => {
     setCaseList([]);
     setisVisible(false);
-    axios.defaults.baseURL = "http://localhost:8080";
+    await BonitaGetCaseArchivedByProcessNameList(user_id, process_name)
+      .then((resp) => {
+        let result = resp;
+        console.log(result.data);
+        if (result.data.length > 0) {
+          setisVisible(true);
+          setCaseList(result.data);
+        } else {
+          setisVisible(false);
+          setCaseList([]);
+        }
+      })
+      .catch((error: any) => {
+        setCaseList([]);
+        setisVisible(false);
+        console.log(error);
+      });
+    return;
+    /*
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
       "application/json;charset=utf-8";
@@ -124,7 +153,8 @@ function CasoArchivadoPorNombreProceso() {
     axios.defaults.withCredentials = true;
     await axios
       .get(
-        "/bonita/API/bpm/archivedCase?c=10&p=0&d=processDefinitionId&d=started_by&d=startedBySubstitute&f=user_id=4&t=0&s=" +
+        "" +
+          process.env.REACT_APP_CASES_ARCHIVED_BY_NAME_PROCES +
           name +
           "&o=startDate+DESC"
       )
@@ -144,7 +174,7 @@ function CasoArchivadoPorNombreProceso() {
         setisVisible(false);
         console.log(error);
       });
-    return;
+    return;*/
   };
 
   return (
@@ -167,7 +197,7 @@ function CasoArchivadoPorNombreProceso() {
             <div className="p-2 bd-highlight">
               {" "}
               <button
-                onClick={() => obtenerCaseList(inputId)}
+                onClick={() => obtenerCaseList(user.id, inputId)}
                 className="btn btn-outline-info btn-sm align-text-bottom"
               >
                 Buscar
@@ -194,7 +224,7 @@ function CasoArchivadoPorNombreProceso() {
               <div className="p-2 bd-highlight">
                 {" "}
                 <button
-                  onClick={() => obtenerCaseList(inputId)}
+                  onClick={() => obtenerCaseList(user.id, inputId)}
                   className="btn btn-outline-info btn-sm align-text-bottom"
                 >
                   Buscar
@@ -261,7 +291,7 @@ function CasoArchivadoPorNombreProceso() {
                           <div>
                             {" "}
                             <button
-                              onClick={() => obtenerCaseList(inputId)}
+                              onClick={() => obtenerCaseList(user.id, inputId)}
                               className="btn btn-outline-info btn-sm align-text-bottom"
                             >
                               {" "}

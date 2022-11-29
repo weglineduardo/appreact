@@ -1,17 +1,17 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  Navigate,
-  redirect,
-  BrowserRouter,
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AlertSuccess from "../screean/alertSuccess";
 import DateTimePicker from "./dateTimePicker";
 import apiGlpi from "../apis/glpi/ApiGlpi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppStore } from "../redux/store";
 import { modifyUser } from "../redux/states/usuarioActivo.state";
+import {
+  BonitaCreateCaseBonitaFechOk,
+  BonitaGetProcessName,
+} from "../apis/bonita/ApiBonita";
+import { iCreateRequest } from "../interfaces/createRequest";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 
@@ -38,9 +38,7 @@ const ChildFormServiceRequest: React.FC<Props> = ({
 }) => {
   let [createCaseId, setCreateCaseId] = useState({});
   let [processId, setProcessId] = useState("");
-  useEffect(() => {
-    getProcessName("ServiceRequest");
-  }, []);
+
   const [alarma, setAlarma] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [creado, setCreado] = useState(false);
@@ -54,6 +52,16 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     const url = `${routeUrl}`;
     navigate(url);
   };
+
+  useEffect(() => {
+    //getProcessName("ServiceRequest");
+    LeerStorage();
+    //BonitaGetProcessName("ServiceRequest");
+  }, []);
+  const LeerStorage = async () => {
+    await BonitaGetProcessName("ServiceRequest");
+    const localStorageUsuario = window.localStorage.getItem("usuario");
+  };
   const createRequerimiento = async (
     sprocessId: string,
     isetProcessId: React.Dispatch<React.SetStateAction<string>>,
@@ -64,28 +72,67 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     ci: string,
     fechaEsperada: string
   ) => {
-    await getProcessName("ServiceRequest");
+    //await getProcessName("ServiceRequest");
+    await BonitaGetProcessName("ServiceRequest");
+    const LsetProcessId = window.localStorage.getItem("setProcessId")
+      ? window.localStorage.getItem("setProcessId")
+      : "";
+    console.log(
+      "window.localStorage.getItem ",
+      window.localStorage.getItem("setProcessId")
+    );
+    setProcessId(LsetProcessId ? LsetProcessId : "");
 
-    if (sprocessId == "") {
-      console.log("sprocessId vacio ", sprocessId);
-      await getProcessName("ServiceRequest");
-      await createCaseBonitaFechOk(sprocessId);
+    if (sprocessId === "") {
+      console.log("sprocessId vacio ", { sprocessId }, { LsetProcessId });
+      await BonitaGetProcessName("ServiceRequest");
+      //await getProcessName("ServiceRequest");
+      const rsp = await createCaseBonitaFechOk(
+        LsetProcessId ? LsetProcessId : ""
+      );
+      setCreado(rsp ? rsp : false);
     } else {
-      await createCaseBonitaFechOk(sprocessId);
+      const rsp = await createCaseBonitaFechOk(
+        LsetProcessId ? LsetProcessId : ""
+      );
+      setCreado(rsp ? rsp : false);
     }
     if (creado) {
+      console.log({ creado });
       showAlert();
     }
+
     setTimeout(function () {
       navigateTo("/app");
-    }, 4000);
+    }, 7000);
   };
+
   const createCaseBonitaFechOk = async (processId: string) => {
+    const prop: iCreateRequest = {
+      processId: "",
+      alarma: "",
+      descripcion: "",
+      prioridad: "",
+      torre: "",
+      ci: "",
+      fechaEsperada: "",
+    };
+    prop.processId = processId;
+    if (prop.processId === "") {
+      console.log("llego vacio el processID : ", processId);
+      return false;
+    }
+    //await BonitaCreateCaseBonitaFechOk(prop);
+
     if (processId === "") {
       console.log("llego vacio el processID : ", processId);
-      return;
+      return false;
     }
-    const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
+    let creadoes = await BonitaCreateCaseBonitaFechOk(prop);
+    console.log({ creadoes });
+    setCreado(creadoes);
+    return creadoes;
+    /*const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("X-Bonita-API-Token", X_Bonita_API_Token);
@@ -120,19 +167,20 @@ const ChildFormServiceRequest: React.FC<Props> = ({
     };
     RequestInit.method = "POST";
 
-    const BASE_URL =
+    let BASE_URL =
       "" +
       process.env.REACT_APP_BASE_URL_API +
       process.env.REACT_APP_POST_CASE +
       processId +
       "/instantiation";
-
+    BASE_URL = BASE_URL.replace("%22", "");
+    console.log("BASE_URL : ", BASE_URL);
+    console.log("BASE_URL : ", { RequestInit });
     await fetch(BASE_URL, RequestInit)
       .then((response) => {
         if (!response.ok) {
           console.log("!result.ok", response);
           setCreado(false);
-
           return;
         }
 
@@ -154,61 +202,13 @@ const ChildFormServiceRequest: React.FC<Props> = ({
         setCreado(false);
         return;
       });
-    return;
+    return;*/
   };
 
   //const apiglpi = new apiGlpi();
   //const respo = apiglpi.loginGlpi();
-  const usuarioActivo = async () => {
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-
-    await axios
-      .get("" + process.env.REACT_APP_API_USERACTIVE)
-      .then((resp) => {
-        let result = resp;
-
-        console.log(result.data);
-        window.localStorage.setItem("usuario", JSON.stringify(result.data));
-        let storrageUser = JSON.stringify(
-          window.localStorage.getItem("usuario")
-        );
-        return;
-      })
-      .catch((error) => {
-        console.log(error);
-
-        return;
-      });
-    return;
-  };
-  const getProcessName = async (processName: string) => {
-    if (processName != "") {
-      let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-      axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-      axios.defaults.headers.post["Content-Type"] =
-        "application/json;charset=utf-8";
-      axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-      axios.defaults.withCredentials = true;
-      axios.defaults.headers.get["X-Bonita-API-Token"] = X_Bonita_API_Token;
-      await axios
-        .get("" + process.env.REACT_APP_GET_PROCESSNAME + processName)
-        .then((resp) => {
-          setProcessId(resp.data[0].id);
-        })
-        .catch((error: any) => {
-          console.log(error);
-        });
-      return;
-    } else {
-      return;
-    }
-  };
   const getHumanTadk = async (user_id: string) => {
-    if (user_id != "") {
+    if (user_id !== "") {
       let X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
       axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
@@ -279,7 +279,7 @@ const ChildFormServiceRequest: React.FC<Props> = ({
       <div className={Style}>
         <div className="card-header">{cardHeader}</div>
         <div className="card-body">
-          <h4 className="card-title">{cardTitle}</h4>
+          <p className="card-title">{cardTitle}</p>
           <p className="card-text">{body}</p>
           <form>
             <fieldset>
@@ -360,7 +360,7 @@ const ChildFormServiceRequest: React.FC<Props> = ({
                   aria-label="Default select example"
                   onChange={(e) => setTorre(e.target.value)}
                 >
-                  <option selected>Seleccione una Torre</option>
+                  <option>Seleccione una Torre</option>
                   <option value="DBA">DBA</option>
                   <option value="Wintel">Wintel</option>
                   <option value="Linux">Linux</option>

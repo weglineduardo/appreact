@@ -1,3 +1,8 @@
+import {
+  managenSessionTokenState,
+  clearSessionToken,
+} from "./persist.data.service";
+
 const axios = require("axios");
 
 class apiGlpi {
@@ -17,6 +22,11 @@ class apiGlpi {
       await axios
         .get("/apirest.php/initSession")
         .then((resp) => {
+          if (resp.status === 200) {
+            managenSessionTokenState(resp.data);
+          } else {
+            clearSessionToken();
+          }
           console.log("axiosLogin", resp.data);
         })
         .catch((error) => {

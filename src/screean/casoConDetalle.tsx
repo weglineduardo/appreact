@@ -11,11 +11,14 @@ import {
   StartedBySubstitute,
 } from "../interfaces/listCaseClient";
 import { iCase } from "../interfaces/case";
-import { formatearFecha } from "../components/formatoFecha";
 
 import { useLocation } from "react-router-dom";
 import ChildFormCasoDetalle from "../components/childFormCasoDetalle";
 import { iUsuario } from "../interfaces/usuario";
+import {
+  BonitaCaseForIdSubstitute,
+  BonitaUsuarioActivo,
+} from "../apis/bonita/ApiBonita";
 
 const CasoConDetalle = () => {
   let iUarioActivo: iUsuario = {
@@ -36,9 +39,9 @@ const CasoConDetalle = () => {
   type listCaseForClient = iListCaseForClient;
   //usamos listCaseForClient para setArchivedCaseList y
   //tambien para setCaseList por que son los mismo atributos
-  const [cantTask, setCantTask] = useState(11);
+  const [cantTask, setCantTask] = useState(0);
   const [usuario, setUsuario] = useState<iUsuario>(iUarioActivo);
-  const [isVisible, setisVisible] = useState(false);
+  const [isVisible, setisVisible] = useState(true);
   const [inputId, setInputId] = useState<string>("1");
   const [caseList, setCaseList] = useState<listCaseForClient[]>([]);
   type caseId = iCase;
@@ -127,9 +130,6 @@ const CasoConDetalle = () => {
       console.log("no es mayor a cero");
       return;
     }
-    const cookies = new Cookies();
-    let JSESSIONIDNODE = cookies.get("JSESSIONIDNODE");
-    let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
 
     axios.defaults.headers.post["Content-Type"] =
@@ -150,20 +150,72 @@ const CasoConDetalle = () => {
       })
       .catch((error: any) => {
         console.log(error);
-        LimpiarUseState;
+        LimpiarUseState();
+        setisVisible(false);
+        return;
+      });
+    return;
+  };
+  const CaseForIdSubstitute = async (id: string) => {
+    setCaseList([]);
+    setisVisible(false);
+    let idint = parseInt(id);
+    if (idint <= 0) {
+      console.log("no es mayor a cero");
+      return;
+    }
+
+    await BonitaCaseForIdSubstitute(id)
+      .then((resp) => {
+        setCaseid(resp.data);
+        setisVisible(true);
+        console.log(resp.data);
+        return;
+      })
+      .catch((error: any) => {
+        console.log(error);
+        LimpiarUseState();
+        setisVisible(false);
+        return;
+      });
+    return;
+  };
+  const caseForIdbkp = async (id: string) => {
+    setCaseList([]);
+    setisVisible(false);
+    let idint = parseInt(id);
+    if (idint <= 0) {
+      console.log("no es mayor a cero");
+      return;
+    }
+    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
+
+    axios.defaults.headers.post["Content-Type"] =
+      "application/json;charset=utf-8";
+    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+    axios.defaults.withCredentials = true;
+    await axios
+      .get(
+        process.env.REACT_APP_GET_CASEFORID +
+          id +
+          "?d=processDefinitionId&d=started_by&d=startedBySubstitute"
+      )
+      .then((resp) => {
+        let result = resp;
+        setCaseid(result.data);
+        setisVisible(true);
+        return;
+      })
+      .catch((error: any) => {
+        console.log(error);
+        LimpiarUseState();
         setisVisible(false);
         return;
       });
     return;
   };
   const usuarioActivo = async () => {
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    await axios
-      .get("" + process.env.REACT_APP_API_USERACTIVE)
+    await BonitaUsuarioActivo()
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
@@ -207,9 +259,9 @@ const CasoConDetalle = () => {
 
   useEffect(() => {
     usuarioActivo();
-    caseForId(idCaso);
-    getHumeanTaskUserCase(usuario.user_id, idCaso);
-  }, [setisVisible]);
+    CaseForIdSubstitute(idCaso);
+    //getHumeanTaskUserCase(usuario.user_id, idCaso);
+  }, []);
   return (
     <>
       {isVisible === false ? (
@@ -245,16 +297,13 @@ const CasoConDetalle = () => {
                   <ChildFormCasoDetalle
                     idAcordion={caseid.processDefinitionId.displayName + "s"}
                     titleAcordion={caseid.processDefinitionId.displayName}
-                    cardHeader={"ID del Caso :" + caseid.id}
+                    cardHeader={"ID del Caso :" + idCaso}
                     cardTitle={""}
                     body={""}
                     textButton={"Añadir comentario"}
                     routeUrl="routeUrl"
                     style={"danger"}
-                    data={
-                      "esta es la data desde  " +
-                      caseid.processDefinitionId.displayName
-                    }
+                    data={"danger"}
                     caseData={caseid}
                     casoId={idCaso}
                     cantTask={cantTask}

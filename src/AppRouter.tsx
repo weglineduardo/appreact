@@ -43,7 +43,7 @@ function AppRouter() {
           errorElement={<ErrorPage />}
         />
         <Route
-          path="caseArchivedByNameProcess"
+          path="caso-archivado-nombre-proceso"
           element={<CaseArchivedByNameProcess />}
           errorElement={<ErrorPage />}
         />

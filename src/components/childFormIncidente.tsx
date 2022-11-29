@@ -169,7 +169,7 @@ const ChildFormIncidente: React.FC<Props> = ({
   };
   const getProcessName = async (processName: string) => {
     console.log("processName: string", processName);
-    if (processName != "") {
+    if (processName !== "") {
       const cookies = new Cookies();
       let X_Bonita_API_Token = cookies.get("X-Bonita-API-Token");
       axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;

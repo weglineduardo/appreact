@@ -154,9 +154,9 @@ const ListaTareas = () => {
   useEffect(() => {
     //let apiglpis = new apiGlpi();
     //apiglpis.loginGlpi();
-    usuarioActivo();
-    getTaskHumanMyUser(usuario.user_id);
-    getTaskHumanOpen(usuario.user_id);
+    //usuarioActivo();
+    //getTaskHumanMyUser(usuario.user_id);
+    //getTaskHumanOpen(usuario.user_id);
   }, []);
   //#endregion
 

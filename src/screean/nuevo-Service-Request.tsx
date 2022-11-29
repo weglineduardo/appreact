@@ -17,8 +17,8 @@ function NuevoServiceRequest() {
                   <div>
                     {" "}
                     <ChildFormServiceRequest
-                      idAcordion={"Incidente"}
-                      titleAcordion={"Incidentes"}
+                      idAcordion={"ServiceRequest"}
+                      titleAcordion={"ServiceRequests"}
                       cardHeader={"Formulario de inicio de requerimiento"}
                       cardTitle={""}
                       body={""}
@@ -31,9 +31,6 @@ function NuevoServiceRequest() {
               </div>
             </div>
           </div>
-          {/*      <div>
-            <Modals id={"vemos o no el modal "} isShow={true} />{" "}
-          </div>*/}
         </div>
       </div>
     </>

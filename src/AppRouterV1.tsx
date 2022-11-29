@@ -16,14 +16,18 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 
 const login = lazy(() => import("./components/login"));
-export const AppContext = React.createContext("");
+export const AppContext = React.createContext({});
 
 export default function AppRouterV1() {
-  const [valuteToshare, setValuteToshare] = useState("valuteToshare 1");
-
   return (
+    /*<Provider store={store}>
+      <AppContext.Provider value={store}>
+        <Home />
+      </AppContext.Provider>
+    </Provider>*/
+
     <Provider store={store}>
-      <AppContext.Provider value={valuteToshare}>
+      <AppContext.Provider value={store}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
@@ -64,7 +68,7 @@ export default function AppRouterV1() {
             errorElement={<ErrorPage />}
           />
           <Route
-            path="/caseById"
+            path="/caso-id"
             element={
               <ProtectedRoute>
                 <CaseById />
@@ -73,7 +77,7 @@ export default function AppRouterV1() {
             errorElement={<ErrorPage />}
           />
           <Route
-            path="/caseByNameProcess"
+            path="/case-nombre-proceso"
             element={
               <ProtectedRoute>
                 <CaseByNameProcess />
@@ -91,7 +95,7 @@ export default function AppRouterV1() {
             errorElement={<ErrorPage />}
           />
           <Route
-            path="/caseArchivedByNameProcess"
+            path="/caso-archivado-nombre-proceso"
             element={
               <ProtectedRoute>
                 <CaseArchivedByNameProcess />

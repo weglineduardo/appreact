@@ -1,5 +1,12 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import axios from "axios";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useReducer,
+} from "react";
+
+import { IGlpilogin } from "../interfaces/gLpi/login";
 import { useNavigate, Link } from "react-router-dom";
 import { iUsuario } from "../interfaces/usuario";
 import "../../node_modules/bootswatch/dist/journal/bootstrapDev.css";
@@ -26,13 +33,16 @@ import {
   createSessionToken,
   resetSessionToken,
 } from "../redux/states/sessionTokenGlpi.state";
-import { persistSessionToken } from "../apis/glpi/persist.data.service";
-import { AxiosResponse } from "axios";
+import {
+  managenSessionTokenState,
+  persistSessionToken,
+} from "../apis/glpi/persist.data.service";
 import {
   BonitaLoginAxios,
   BonitaUsuarioActivo,
 } from "../apis/bonita/ApiBonita";
 import { managenUsuarioState } from "../apis/bonita/persist.data.service";
+import apiGlpi from "../apis/glpi/ApiGlpi";
 
 function Login() {
   const userState = useSelector((store: AppStore) => store.usuarioActivo);
@@ -41,11 +51,6 @@ function Login() {
     (store: AppStore) => store.sessionTokenGlpiSlice
   );
   const dispatch = useDispatch();
-  //const {
-  //  register,
-  //  handleSubmit,
-  //  formState: { errors },
-  //} = useForm({ defaultvalues: { email: "", pass: "" } });
 
   const { user_id } = useContext(UsuarioContext);
   const [inputUsuario, setInputUsuario] = useState("");
@@ -60,7 +65,19 @@ function Login() {
   const [bredirect, setBredirect] = useState(false);
   const [isLogin, setLogin] = useState(false);
   const [serviceLogin, setServiceLogin] = useState("");
-  const [usuario, setUsuario] = useState<iUarioActivo>();
+  let iUarioActivo: iUsuario = {
+    copyright: "",
+    is_guest_user: "",
+    branding_version: "",
+    branding_version_with_date: "",
+    user_id: "",
+    user_name: "",
+    session_id: "",
+    conf: "",
+    is_technical_user: "",
+    version: "",
+  };
+  const [usuario, setUsuario] = useState<iUsuario>();
 
   const [initSession, SetInitSession] = useState("");
   //#region
@@ -76,25 +93,76 @@ function Login() {
 
   const fetchLoginService = async () => {
     setShow(false);
+    let data = {};
     let bonitaLoginAxios = await BonitaLoginAxios(inputUsuario, inputPass);
-    console.log({ bredirect }, { bonitaLoginAxios });
+    //console.log({ bredirect }, { bonitaLoginAxios });
     if (bonitaLoginAxios) {
+      const login = await usuarioActivo();
+      console.log({ login });
+
       const bonitaUsuarioActivo = await BonitaUsuarioActivo();
+
       if (bonitaUsuarioActivo.status === 200) {
         console.log({ bonitaLoginAxios });
+        data = bonitaUsuarioActivo.data;
         await dispatch(createUser(bonitaUsuarioActivo.data));
         await managenUsuarioState(bonitaUsuarioActivo.data);
-      } else {
+        bonitaLoginAxios = true;
+        //login glpi
+        //console.log({ bonitaLoginAxios });
+
+        /*console.log("const apiglpis = new apiGlpi()");
+        const apiglpis = new apiGlpi();
+
+        console.log("const apiglpis = new apiGlpi()");
+        apiglpis.loginGlpi();
+
+        console.log("const apiglpis = new apiGlpi()");
+        console.log(window.localStorage.getitem("glpiSssion_token"));
+        if (window.localStorage.getitem("glpiSssion_token")) {
+          console.log("const apiglpis = new apiGlpi()");
+          await dispatch(createSessionToken({}));
+          const tokenglpi: IGlpilogin = {
+            session_token: "",
+          };
+          await managenSessionTokenState(tokenglpi);
+          bonitaLoginAxios = true;
+        } else {
+          bonitaLoginAxios = false;
+          console.log({ bonitaLoginAxios });
+        }*/
         console.log({ bonitaLoginAxios });
+      } else {
+        console.log("bonitaLoginAxios", { bonitaLoginAxios });
         bonitaLoginAxios = false;
       }
     }
 
+    console.log({ bonitaLoginAxios });
     if (bonitaLoginAxios) {
-      return navigateTo("home");
+      console.log({ bonitaLoginAxios });
+      navigateTo("home");
     } else {
       setShow(true);
     }
+  };
+
+  const usuarioActivo = async () => {
+    let login = false;
+    await BonitaUsuarioActivo()
+      .then((resp) => {
+        if (resp.status === 200) {
+          login = true;
+          setUsuario(resp.data);
+          console.log(resp.data);
+        } else {
+          login = false;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return login;
   };
 
   const loginFetchGlpi = async () => {
@@ -210,12 +278,13 @@ function Login() {
 
                         <div className="form-group ">
                           <h4 className="card-title"></h4>
-                          <button
+                          <a
                             className="btn btn-succes"
                             onClick={fetchLoginService}
+                            href="/home"
                           >
                             Ingresar
-                          </button>
+                          </a>
 
                           {/*<button
                             className="btn btn-succes"
@@ -255,3 +324,9 @@ function Login() {
 }
 
 export default Login;
+
+//const {
+//  register,
+//  handleSubmit,
+//  formState: { errors },
+//} = useForm({ defaultvalues: { email: "", pass: "" } });

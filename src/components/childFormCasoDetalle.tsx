@@ -7,6 +7,11 @@ import { iListCaseForClient } from "../interfaces/listCaseClient";
 import { formatearFecha } from "./formatoFecha";
 import { iComment } from "../interfaces/comment";
 import Icons from "./icons";
+import {
+  BonitaAddCommentFetch,
+  BonitaCaseForId,
+  BonitaGetListComment,
+} from "../apis/bonita/ApiBonita";
 const { Cookies: kks } = require("react-cookie");
 const cok = new kks();
 type caseId = iCase;
@@ -41,15 +46,21 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
   cantTask,
 }) => {
   type comment = iComment;
+  type listCaseForClient = iListCaseForClient;
   const [listComments, setListComments] = useState<comment[]>([]);
-  //setCaseid(data);
-  let [processId, setProcessId] = useState("");
+
+  const [caseid, setCaseid] = useState<iListCaseForClient>();
+  const [caseList, setCaseList] = useState<iListCaseForClient[]>([]);
   const [comments, setComments] = useState("");
   const [creado, setCreado] = useState(false);
   const [show, setShow] = useState(false);
   const Style = `card border-primary mb-${style}`;
 
-  console.log("processId 1", processId);
+  //console.log("processId 1", processId);
+  console.log({ caseData });
+  console.log("data", { data });
+
+  console.log("casoId", { casoId });
 
   const addComment = async (caseId: string, comment: string) => {
     await addCommentFetch(casoId, comment);
@@ -61,41 +72,13 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
   };
 
   const addCommentFetch = async (caseId: string, comments: string) => {
-    const X_Bonita_API_Token = cok.get("X-Bonita-API-Token");
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("X-Bonita-API-Token", X_Bonita_API_Token);
-    var urlencoded = new URLSearchParams();
-
-    const raw = JSON.stringify({
-      processInstanceId: caseId,
-      content: comments,
-    });
-
-    const RequestInit: RequestInit = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-      credentials: "include",
-    };
-    RequestInit.method = "POST";
-    let url: string | undefined = process.env.REACT_APP_BASE_URL_API;
-    let a: string | undefined = process.env.REACT_APP_ADD_COMMENT;
-    const BASE_URL =
-      process.env.REACT_APP_BASE_URL_API +
-      "" +
-      process.env.REACT_APP_ADD_COMMENT;
-    console.log("RequestInit", RequestInit);
-
-    await fetch(BASE_URL, RequestInit)
+    await BonitaAddCommentFetch(caseId, comments)
       .then((result) => {
         if (!result.ok) {
           console.log("!result.ok", result);
           setCreado(false);
           return;
         }
-
         window.localStorage.setItem(
           "addCommentFetch",
           JSON.stringify(result.body)
@@ -113,20 +96,13 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
     return;
   };
   const getListComment = async (caseId: string) => {
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    await axios
-      .get(process.env.REACT_APP_LISTCOMMENT + caseId + "&d=userId&t=0")
+    await BonitaGetListComment(caseId)
       .then((resp) => {
         let result = resp;
         setListComments(result.data);
         console.log("setListComments", result.data);
-        if (result.data.length == 0) {
+        if (result.data.length === 0) {
           console.log("lista vacia");
-          //setShow(true);
         } else {
           //setShow(false);
         }
@@ -136,12 +112,43 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
         setListComments([]);
         console.log(error);
       });
+  };
+  const caseForIdb = async (id: string) => {
+    //setCaseList([]);
+    setShow(false);
+    let idint = parseInt(id);
+    if (idint <= 0) {
+      console.log("no es mayor a cero");
+      setShow(false);
+      return;
+    }
+
+    await BonitaCaseForId(id)
+      .then((resp) => {
+        let result = resp;
+        setCaseid(result.data);
+        setCaseList(result.data);
+
+        console.log(result.data);
+        setShow(true);
+        //return;
+      })
+      .catch((error: any) => {
+        console.log(error);
+        setShow(false);
+        //return;
+      });
     return;
   };
   //llamaos al listado de comentaros en el load page
   useEffect(() => {
     getListComment(casoId);
+    //caseForIdb(casoId);
   }, [casoId]);
+  useEffect(() => {
+    //caseForIdb(casoId);
+    //console.log("caseList, caseData ", { caseList, caseData });
+  }, [casoId, listComments]);
 
   const showAlert = () => {
     if (creado) {
@@ -191,7 +198,6 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
           <a
             className="nav-link active"
             data-bs-toggle="tab"
-            href="#"
             aria-selected="true"
             role="tab"
             onClick={() => getComments(casoId)}
@@ -223,83 +229,75 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
             <h5 className="form-label mt-1 text-start">General</h5>
             <p className="form-label mt-1 text-start"></p>
           </div>
-          <div className="d-flex col">
-            <div className="col">
-              <p className="form-label mt-1 text-start">
-                {"Nombre de proceso (version)"}
-              </p>
-            </div>
-            <div className="col">
-              <p className="form-label mt-1 text-start">
-                {caseData.processDefinitionId.displayName}
-              </p>
-            </div>
+        </div>
+        <div className="d-flex col">
+          <div className="col">
+            <p className="form-label mt-1 text-start">
+              {"Nombre de proceso (version)"}
+            </p>
           </div>
-
-          <div className="d-flex col">
-            <div className="col">
-              <p className="form-label mt-1 text-start">Iniciado por</p>
-            </div>
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">
-                {caseData.startedBySubstitute.firstname +
-                  " " +
-                  caseData.startedBySubstitute.lastname}
-              </p>
-            </div>
-          </div>
-
-          <div className="d-flex col">
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">Iniciado el</p>
-            </div>
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">
-                {formatearFecha(caseData.start)}
-              </p>
-            </div>
-          </div>
-
-          <div className="d-flex col">
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">Status</p>
-            </div>
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">{caseData.state}</p>
-            </div>
-          </div>
-
-          <div className="d-flex col">
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">Última actualización</p>
-            </div>
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">
-                {formatearFecha(caseData.last_update_date)}
-              </p>
-            </div>
-          </div>
-
-          <div className="d-flex col">
-            <div className="col">
-              {" "}
-              <p className="form-label mt-1 text-start">Tareas disponibles</p>
-            </div>
-            <div className="col">
-              <p className="form-label mt-1 text-start">
-                <a href="/tareas">{cantTask}</a>
-              </p>
-            </div>
+          <div className="col">
+            <p className="form-label mt-1 text-start">
+              {caseData.processDefinitionId.displayName}
+            </p>
           </div>
         </div>
-
+        <div className="d-flex col">
+          <div className="col">
+            <p className="form-label mt-1 text-start">Iniciado por</p>
+          </div>
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">
+              {`${caseData.startedBySubstitute.firstname} ${caseData.startedBySubstitute.lastname}`}
+            </p>
+          </div>
+        </div>
+        <div className="d-flex col">
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">Iniciado el</p>
+          </div>
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">
+              {formatearFecha(caseData.start)}
+            </p>
+          </div>
+        </div>
+        <div className="d-flex col">
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">Status</p>
+          </div>
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">{caseData.state}</p>
+          </div>
+        </div>
+        <div className="d-flex col">
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">Última actualización</p>
+          </div>
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">
+              {formatearFecha(caseData.last_update_date)}
+            </p>
+          </div>
+        </div>
+        <div className="d-flex col">
+          <div className="col">
+            {" "}
+            <p className="form-label mt-1 text-start">Tareas disponibles</p>
+          </div>
+          <div className="col">
+            <p className="form-label mt-1 text-start">
+              <a href="/tareas">{cantTask}</a>
+            </p>
+          </div>
+        </div>
         {writeCommets}
       </fieldset>
     </form>
@@ -307,13 +305,14 @@ const ChildFormCasoDetalle: React.FC<Props> = ({
   const bodyCard = (
     <div className={Style}>
       <div></div>
-      <div> {cardTitle} </div>
+      <div> {cardTitle}</div>
       <div className="card-header">{cardHeader}</div>
       <div className="card-body">
         <h4 className="card-title">{cardTitle}</h4>
         <p className="card-text"></p>
         {formData}
       </div>
+
       <button
         onClick={() => addComment(casoId, comments)}
         className="btn btn-primary btn-sm"

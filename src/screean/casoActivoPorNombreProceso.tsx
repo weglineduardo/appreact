@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import axios, { AxiosResponse } from "axios";
 import {
@@ -10,6 +11,11 @@ import {
 import { iCase } from "../interfaces/case";
 import { formatearFecha } from "../components/formatoFecha";
 import { iUsuario } from "../interfaces/usuario";
+import {
+  BonitaGetCaseByProcessNameList,
+  BonitaUsuarioActivo,
+} from "../apis/bonita/ApiBonita";
+import { useNavigate } from "react-router";
 
 function casoActivoPorNombreProceso() {
   type listCaseForClient = iListCaseForClient;
@@ -27,9 +33,7 @@ function casoActivoPorNombreProceso() {
     is_technical_user: "",
     version: "",
   };
-  const [archivedCaseList, setArchivedCaseList] = useState<listCaseForClient[]>(
-    []
-  );
+
   const [usuario, setUsuario] = useState<iUsuario>(iUarioActivo);
 
   const [isVisible, setisVisible] = useState(false);
@@ -107,16 +111,9 @@ function casoActivoPorNombreProceso() {
     processDefinitionId: processDefinitionId,
   };
 
-  const LimpiarUseState = () => {
-    const [caseList, setCaseList] = useState<listCaseForClient>(elcase);
-  };
-  const [caseid, setCaseid] = useState<listCaseForClient>(elcase);
   useEffect(() => {
-    if (!isVisible) {
-      console.log("useLayoutEffect");
-    }
-  }, [setisVisible]);
-
+    usuarioActivo();
+  }, []);
   useLayoutEffect(() => {
     if (!isVisible) {
       console.log("useLayoutEffect");
@@ -124,33 +121,25 @@ function casoActivoPorNombreProceso() {
   }, [setisVisible]);
 
   useEffect(() => {
-    usuarioActivo;
+    // usuarioActivo;
   }, []);
+  const navigate = useNavigate();
 
+  const navigateTo = (routeUrl: string) => {
+    const url = `/caso-detalle/?id=${routeUrl}`;
+    navigate(url);
+  };
   const obtenerCaseList = async (name: string) => {
+    await usuarioActivo();
     setCaseList([]);
     setisVisible(false);
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    await axios
-      .get(
-        "" +
-          process.env.REACT_APP_LISTCASEACTIVED +
-          usuario.user_id +
-          "&n=activeFlowNodes&n=failedFlowNodes&t=0&s=" +
-          name +
-          "&o=startDate+DESC"
-      )
+    console.log("usuario.user_id :", usuario.user_id);
+    await BonitaGetCaseByProcessNameList(usuario.user_id, name)
       .then((resp) => {
-        let result = resp;
-        console.log(result.data);
-        if (result.data.length > 0) {
+        console.log(resp.data);
+        if (resp.data.length > 0) {
           setisVisible(true);
-          setCaseList(result.data);
+          setCaseList(resp.data);
         } else {
           setisVisible(false);
           setCaseList([]);
@@ -164,14 +153,7 @@ function casoActivoPorNombreProceso() {
     return;
   };
   const usuarioActivo = async () => {
-    axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios.defaults.withCredentials = true;
-    await axios
-      .get("" + process.env.REACT_APP_API_USERACTIVE)
+    await BonitaUsuarioActivo()
       .then((resp) => {
         let result = resp;
         setUsuario(result.data);
@@ -182,139 +164,142 @@ function casoActivoPorNombreProceso() {
       });
     return;
   };
-  return (
-    <>
-      {isVisible === false ? (
-        <div className="">
-          <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
-            <div className="p-2 bd-highlight">
-              Nombre o inicio del nombre del proceso
-            </div>
-            <div className="p-2 bd-highlight">
-              <input
-                type="text"
-                className=""
-                id="caseId"
-                placeholder=" Nombre o inicio del nombre del proceso"
-                onChange={(e) => setInputId(e.target.value)}
-              />
-            </div>
-            <div className="p-2 bd-highlight">
-              {" "}
-              <button
-                onClick={() => obtenerCaseList(inputId)}
-                className="btn btn-outline-info btn-sm align-text-bottom"
-              >
-                Buscar
-              </button>
-            </div>
-          </div>
+  const layer_1 = (
+    <div className="">
+      <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
+        <div className="p-2 bd-highlight">
+          Nombre o inicio del nombre del proceso
         </div>
-      ) : (
-        <div>
-          <div className="">
-            <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
-              <div className="p-2 bd-highlight">
-                Nombre o inicio del nombre del proceso
-              </div>
-              <div className="p-2 bd-highlight">
-                <input
-                  type="text"
-                  className=""
-                  id="caseId"
-                  placeholder="Nombre o inicio del nombre del proceso"
-                  onChange={(e) => setInputId(e.target.value)}
-                />
-              </div>
-              <div className="p-2 bd-highlight">
-                {" "}
-                <button
-                  onClick={() => obtenerCaseList(inputId)}
-                  className="btn btn-outline-info btn-sm align-text-bottom"
-                >
-                  Buscar
-                </button>
-              </div>
-            </div>
-          </div>
-          <ul className="nav nav-tabs" role="tablist">
-            <li className="nav-item" role="presentation">
-              <a
-                className="nav-link active"
-                data-bs-toggle="tab"
-                href="#home"
-                aria-selected="true"
-                role="tab"
-              >
-                Casos encontrados
-              </a>
-            </li>
-          </ul>
+        <div className="p-2 bd-highlight">
+          <input
+            type="text"
+            className=""
+            id="caseId"
+            placeholder=" Nombre o inicio del nombre del proceso"
+            onChange={(e) => setInputId(e.target.value)}
+          />
+        </div>
+        <div className="p-2 bd-highlight">
+          {" "}
+          <button
+            onClick={() => obtenerCaseList(inputId)}
+            className="btn btn-outline-info btn-sm align-text-bottom"
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+  const layer_2_1 = (
+    <div className="">
+      <div id="tabla" className="d-flex flex-row bd-highlight mb-3">
+        <div className="p-2 bd-highlight">
+          Nombre o inicio del nombre del proceso
+        </div>
+        <div className="p-2 bd-highlight">
+          <input
+            type="text"
+            className=""
+            id="caseId"
+            placeholder="Nombre o inicio del nombre del proceso"
+            onChange={(e) => setInputId(e.target.value)}
+          />
+        </div>
+        <div className="p-2 bd-highlight">
+          {" "}
+          <button
+            onClick={() => obtenerCaseList(inputId)}
+            className="btn btn-outline-info btn-sm align-text-bottom"
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+  const layer_2_2 = (
+    <ul className="nav nav-tabs" role="tablist">
+      <li className="nav-item" role="presentation">
+        <a
+          className="nav-link active"
+          data-bs-toggle="tab"
+          href="#home"
+          aria-selected="true"
+          role="tab"
+        >
+          Casos encontrados
+        </a>
+      </li>
+    </ul>
+  );
+  const layer_2_3 = (
+    <div id="myTabContent" className="tab-content">
+      <div className="tab-pane fade active show " id="home" role="tabpanel">
+        <div className="row">
+          {" "}
+          <div className="column"></div>
+          <div className="column">
+            <div className="row"></div>
 
-          <div id="myTabContent" className="tab-content">
-            <div
-              className="tab-pane fade active show "
-              id="home"
-              role="tabpanel"
-            >
-              <div className="row">
-                {" "}
-                <div className="column"></div>
-                <div className="column">
-                  <div className="row"></div>
-
-                  <p>Estos son casos abiertos</p>
-                  {caseList.map((list) => (
-                    <div className="container ">
-                      <div className="row shadow p-2 mb-3 bg-white rounded">
-                        <div className="col">
-                          <div>Id </div>
-                          <div>{list.id} </div>
-                        </div>
-                        <div className="col">
-                          <div> Nombre proceso </div>
-                          <div>{list.processDefinitionId.displayName} </div>
-                        </div>
-                        <div className="col">
-                          <div>Iniciado por </div>
-                          <div>
-                            {" "}
-                            {list.startedBySubstitute.firstname}{" "}
-                            {list.startedBySubstitute.lastname}{" "}
-                          </div>
-                        </div>
-                        <div className="col">
-                          {" "}
-                          <div>Fecha inicio</div>
-                          <div>{formatearFecha(list.start)} </div>
-                        </div>
-                        <div className="col">
-                          <div>Tareas</div>
-                          <div>{list.id} </div>
-                        </div>
-                        <div className="col">
-                          <div>
-                            {" "}
-                            <button
-                              onClick={() => obtenerCaseList(inputId)}
-                              className="btn btn-outline-info btn-sm align-text-bottom"
-                            >
-                              {" "}
-                              Ver{" "}
-                            </button>{" "}
-                          </div>
-                        </div>
-                      </div>
+            {caseList.map((list) => (
+              <div className="container ">
+                <p>Estos son casos abiertos</p>
+                <div className="row shadow p-2 mb-3 bg-white rounded">
+                  <div className="col">
+                    <div>Id </div>
+                    <div>{list.id} </div>
+                  </div>
+                  <div className="col">
+                    <div> Nombre proceso </div>
+                    <div>{list.processDefinitionId.displayName} </div>
+                  </div>
+                  <div className="col">
+                    <div>Iniciado por </div>
+                    <div>
+                      {" "}
+                      {list.startedBySubstitute.firstname}{" "}
+                      {list.startedBySubstitute.lastname}{" "}
                     </div>
-                  ))}
+                  </div>
+                  <div className="col">
+                    {" "}
+                    <div>Fecha inicio</div>
+                    <div>{formatearFecha(list.start)} </div>
+                  </div>
+                  <div className="col">
+                    <div>Tareas</div>
+                    <div>{list.id} </div>
+                  </div>
+                  <div className="col">
+                    <div>
+                      {" "}
+                      <button
+                        onClick={() => navigateTo(list.id)}
+                        className="btn btn-outline-info btn-sm align-text-bottom"
+                      >
+                        {" "}
+                        Ver{" "}
+                      </button>{" "}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
+  const layer_2 = (
+    <div>
+      {layer_2_1}
+      {layer_2_2}
+
+      {layer_2_3}
+    </div>
+  );
+  return <>{isVisible === false ? layer_1 : layer_2}</>;
 }
 
 export default casoActivoPorNombreProceso;

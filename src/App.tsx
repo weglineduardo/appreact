@@ -11,8 +11,6 @@ import axios from "axios";
 import "./App.css";
 
 function App() {
-  const [serviceLogin, setServiceLogin] = useState("");
-
   const axioslogin = async () => {
     axios.defaults.baseURL = process.env.REACT_APP_BASE_URL_API;
     axios.defaults.headers.post["Content-Type"] =
@@ -55,7 +53,7 @@ function App() {
       headers: { "Access-Control-Allow-Origin": "*" },
     };
     const rst = await axios(config)
-      .then(function(res) {
+      .then(function (res) {
         console.log(" await axios");
         console.log(JSON.stringify(res.data));
         const data_array = JSON.stringify(res.data).split(",");
@@ -67,7 +65,7 @@ function App() {
 
         cok.set("X-Bonita-API-Token", data_array[1].split(":")[1].split(","));
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       });
   };
